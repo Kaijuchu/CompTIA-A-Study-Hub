@@ -32,12 +32,15 @@ create table if not exists public.progress (
 -- Row Level Security: each user can only ever touch their own row
 alter table public.progress enable row level security;
 
+-- note the (select auth.uid()) wrapper: it makes Postgres evaluate the current
+-- user once per query instead of once per row, which keeps Supabase's
+-- Performance Advisor happy and scales better
 create policy "read own progress"   on public.progress
-  for select using (auth.uid() = id);
+  for select using ((select auth.uid()) = id);
 create policy "insert own progress" on public.progress
-  for insert with check (auth.uid() = id);
+  for insert with check ((select auth.uid()) = id);
 create policy "update own progress" on public.progress
-  for update using (auth.uid() = id) with check (auth.uid() = id);
+  for update using ((select auth.uid()) = id) with check ((select auth.uid()) = id);
 ```
 
 You should see **Success. No rows returned.**
