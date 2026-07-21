@@ -2099,12 +2099,39 @@ function scheduleCloudPush(){
     CLOUD.timer=setTimeout(cloudPush,4000);         // upload-only, so this can't loop back into itself
   }catch(e){ /* not ready yet */ }
 }
+/* Free replacement for Supabase's paid "leaked password protection".
+   Uses the Have I Been Pwned range API with k-anonymity: we hash the password,
+   send only the first 5 characters of that hash, and compare the rest locally —
+   so the password itself never leaves this device. */
+async function pwnedCount(password){
+  try{
+    if(!(window.crypto&&window.crypto.subtle)) return 0;      // needs a secure context
+    const bytes=new TextEncoder().encode(password);
+    const digest=await window.crypto.subtle.digest("SHA-1",bytes);
+    const hex=Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,"0")).join("").toUpperCase();
+    const prefix=hex.slice(0,5), suffix=hex.slice(5);
+    const r=await fetch("https://api.pwnedpasswords.com/range/"+prefix);
+    if(!r.ok) return 0;
+    const body=await r.text();
+    const hit=body.split("\n").find(l=>l.split(":")[0].trim()===suffix);
+    return hit ? parseInt(hit.split(":")[1],10)||0 : 0;
+  }catch(e){ return 0; }                                       // offline or blocked: don't block sign-up
+}
 async function cloudAuth(mode){
   const em=document.getElementById("acc-email"), pw=document.getElementById("acc-pass");
   const email=em?em.value.trim():"", pass=pw?pw.value:"";
   if(!email||!pass){ AUTHUI.msg="Enter an email and password."; CLOUD.msg=AUTHUI.msg; render(); return; }
-  if(mode==="up"&&pass.length<6){ AUTHUI.msg="Password must be at least 6 characters."; CLOUD.msg=AUTHUI.msg; render(); return; }
-  CLOUD.busy=true; AUTHUI.busy=true; AUTHUI.msg=mode==="up"?"Creating account…":"Signing in…"; CLOUD.msg=AUTHUI.msg; render();
+  if(mode==="up"&&pass.length<8){ AUTHUI.msg="Please use at least 8 characters."; CLOUD.msg=AUTHUI.msg; render(); return; }
+  CLOUD.busy=true; AUTHUI.busy=true; AUTHUI.msg=mode==="up"?"Checking password…":"Signing in…"; CLOUD.msg=AUTHUI.msg; render();
+  if(mode==="up"){
+    const breaches=await pwnedCount(pass);
+    if(breaches>0){
+      CLOUD.busy=false; AUTHUI.busy=false;
+      AUTHUI.msg="That password has appeared in "+breaches.toLocaleString()+" known data breaches — please choose a different one.";
+      CLOUD.msg=AUTHUI.msg; render(); return;
+    }
+    AUTHUI.msg="Creating account…"; render();
+  }
   try{
     const cl=await cloudClient();
     const {data,error}= mode==="up"
