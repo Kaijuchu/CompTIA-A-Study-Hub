@@ -790,7 +790,7 @@ function nav(){
   if(fab){ const i=fab.querySelector(".ico"); if(i&&!i.innerHTML) i.innerHTML=NAV_ICONS.ai; }
 }
 function toggleSb(){ S.sbCollapsed=!S.sbCollapsed; save(); render(); }
-function go(t){ tab=t; quiz=null; lab=null; stop3D(); render(); }
+function go(t){ tab=t; lab=null; if(quiz&&quiz.done) quiz=null; stop3D(); render(); }
 function render(){ nav();
   if(typeof document!=="undefined"&&document.body)
     document.body.className = (S.theme==="light"?"light ":"")+(S.sbCollapsed?"sb-min ":"")+(sbOpen?"sb-open":"");
@@ -837,7 +837,8 @@ function dashView(){
       ${S.streak.count?`<span class="pill">${ic("flame")} ${S.streak.count}-day streak</span>`:""}
     </div>
     <div class="row" style="justify-content:center;margin-top:14px">
-      <button class="btn" onclick="startQuiz('quick')">Quick quiz (10)</button>
+      ${hasSession()?`<button class="btn" onclick="resumeSession()">Resume quiz (${Math.min((S.session.idx||0)+1,S.session.items.length)}/${S.session.items.length})</button>`:""}
+      <button class="btn${hasSession()?" secondary":""}" onclick="startQuiz('quick')">Quick quiz (${S.quizLen})</button>
       <button class="btn secondary" ${missed?"":"disabled"} onclick="startQuiz('missed')">Review missed (${missed})</button>
     </div>
   </div>
@@ -870,14 +871,44 @@ function startQuiz(mode){
   }
   if(!items.length){ alert("No questions available for that mode yet."); return; }
   quiz={items:prep(items), idx:0, right:0, answered:null, results:[]};
-  tab="quiz"; render();
+  tab="quiz"; persistSession(); render();
 }
 function prep(items){ return items.map(it=>({...it, perm:S.shuffleOpts?shuffle([0,1,2,3]):[0,1,2,3]})); }
+/* ---- session persistence: an unfinished quiz survives tab switches and page reloads ---- */
+function persistSession(){
+  if(quiz && !quiz.done){
+    S.session={items:quiz.items, idx:quiz.idx, right:quiz.right, answered:quiz.answered,
+      results:quiz.results.map(r=>({q:r.q,ok:r.ok})), at:Date.now()};
+  } else S.session=null;
+  save();
+}
+function hasSession(){ return !!(S.session && S.session.items && S.session.items.length); }
+function resumeSession(){
+  if(!hasSession()) return;
+  const s=S.session;
+  quiz={items:s.items, idx:s.idx||0, right:s.right||0, answered:(s.answered===undefined?null:s.answered), results:s.results||[]};
+  tab="quiz"; render();
+}
+function endQuiz(){
+  if(quiz && !quiz.done && !confirm("End this quiz? Your answered questions are already saved.")) return;
+  quiz=null; S.session=null; save(); render();
+}
+function sessionCard(){
+  if(!hasSession()) return "";
+  const s=S.session, done=s.idx||0, total=s.items.length;
+  const ago=Math.round((Date.now()-(s.at||Date.now()))/60000);
+  return `<div class="card"><h2>${ic("pencil")}Quiz in progress</h2>
+    <div class="muted" style="margin-bottom:12px">You're on question ${Math.min(done+1,total)} of ${total}${ago>0?` · paused ${ago<60?ago+" min":Math.round(ago/60)+" hr"} ago`:""}.</div>
+    <div class="row">
+      <button class="btn" onclick="resumeSession()">Resume quiz</button>
+      <button class="btn secondary" onclick="endQuiz()">Discard</button>
+    </div></div>`;
+}
 function startGapQuiz(){
   const top=gapScores().slice(0,3).map(g=>g.id);
   const items=shuffle(pool(top)).slice(0,12);
   quiz={items:prep(items), idx:0, right:0, answered:null, results:[]};
-  tab="quiz"; render();
+  tab="quiz"; persistSession(); render();
 }
 function answer(k){
   if(quiz.answered!==null) return;
@@ -894,17 +925,17 @@ function answer(k){
     S.streak.count = S.streak.last===y ? S.streak.count+1 : 1;
     S.streak.last=t;
   }
-  save(); render();
+  persistSession(); render();
 }
 function nextQ(){
-  if(quiz.idx+1>=quiz.items.length){ quiz.done=true; S.sessions++; save(); }
+  if(quiz.idx+1>=quiz.items.length){ quiz.done=true; S.sessions++; }
   else { quiz.idx++; quiz.answered=null; }
-  render();
+  persistSession(); render();
 }
 function quizSetupView(){
   const missed=missedList().length;
   const focusNames=S.focus.length===DOMAINS.length?"All domains":DOMAINS.filter(d=>S.focus.includes(d.id)).map(d=>d.name).join(", ");
-  return `
+  return `${sessionCard()}
   <div class="card"><h2>Practice modes</h2>
     <div class="muted" style="margin-bottom:14px">Current focus: <b style="color:var(--text)">${focusNames||"none — select in Focus Areas"}</b></div>
     <div class="row">
@@ -956,7 +987,10 @@ function quizView(){
   }
   const q=quiz.items[quiz.idx], dom=DOMAINS.find(d=>d.id===q.d), a=quiz.answered;
   return `<div class="card">
-    <div class="qnum">Question ${quiz.idx+1} of ${quiz.items.length} · ${dom.name}<span class="tag ${dom.core===1?'c1':'c2'}">Core ${dom.core}</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+      <div class="qnum">Question ${quiz.idx+1} of ${quiz.items.length} · ${dom.name}<span class="tag ${dom.core===1?'c1':'c2'}">Core ${dom.core}</span></div>
+      <button class="ai-close" title="End quiz" onclick="endQuiz()">✕</button>
+    </div>
     <div class="question">${q.q}</div>
     ${(q.perm||[0,1,2,3]).map((oi,pos)=>{
       let cls="opt";
@@ -1090,7 +1124,12 @@ async function callGemini(messages, system, maxTokens){
       })});
   }catch(err){ throw new Error(FETCH_HELP); }
   let j; try{ j = await r.json(); }catch(e){ throw new Error("Gemini returned an unreadable response (HTTP "+r.status+"). Try again in a moment."); }
-  if(j.error) throw new Error((j.error.message||"Gemini API error")+(String(j.error.message||"").includes("quota")?" — free-tier limit hit; wait a minute and retry.":""));
+  if(j.error){
+    const m=String(j.error.message||"Gemini API error");
+    if(/not found|not supported|unsupported|invalid model/i.test(m))
+      throw new Error('The model "'+S.gemModel+'" isn\'t available on your key. Open Settings → AI setup and click "Fetch live model list", then pick one and Save.');
+    throw new Error(m+(/quota|rate/i.test(m)?" — free-tier limit hit; wait a minute and retry.":""));
+  }
   const cand=j.candidates&&j.candidates[0];
   if(!cand||!cand.content||!cand.content.parts) throw new Error("Gemini returned no text (possibly rate-limited or blocked) — wait a moment and retry.");
   return cand.content.parts.map(p=>p.text||"").join("");
@@ -1332,7 +1371,7 @@ async function runGen(){
     const startIdx=QUESTIONS.length;
     QUESTIONS.push(...good); S.aiQ.push(...good); save();
     const items=good.map((q,k)=>({...q,i:startIdx+k}));
-    quiz={items:prep(items),idx:0,right:0,answered:null,results:[]}; tab="quiz"; render();
+    quiz={items:prep(items),idx:0,right:0,answered:null,results:[]}; tab="quiz"; persistSession(); render();
   }catch(e){
     btn.disabled=false; btn.innerHTML=ic("zap")+" Generate 5 AI questions";
     document.getElementById("gen-msg").innerHTML='<span class="danger">'+esc(e.message)+"</span>";
