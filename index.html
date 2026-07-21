@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A+ Study Hub — 220-1201 / 220-1202</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0' stop-color='%23f4f4f5'/><stop offset='1' stop-color='%238b5cf6'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='%230a0a0c'/><rect x='1' y='1' width='62' height='62' rx='13' fill='none' stroke='%23333338' stroke-width='2'/><text x='32' y='43' font-family='Arial' font-size='30' font-weight='800' text-anchor='middle' fill='url(%23g)'>A+</text></svg>">
+<style>
+  :root{
+    --bg:#050506; --card:rgba(255,255,255,.035); --card2:rgba(255,255,255,.065); --border:rgba(255,255,255,.09);
+    --text:#ececee; --muted:#9a9aa3; --accent:#e4e4e7; --accent2:#a1a1aa; --accent-ink:#121216;
+    --glow:rgba(255,255,255,.18);
+    --good:#3ddc84; --warn:#ffb84d; --bad:#ff5d6c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',system-ui,sans-serif;min-height:100vh}
+  .wrap{max-width:960px;margin-left:240px;margin-right:auto;padding:16px 24px 80px;transition:margin .25s}
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 0 10px}
+  header h1{font-size:1.35rem;font-weight:700}
+  header h1 span{color:var(--accent)}
+  .sub{color:var(--muted);font-size:.8rem}
+  /* ---- collapsible sidebar ---- */
+  #sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;z-index:30;display:flex;flex-direction:column;
+    padding:16px 12px;background:var(--card);border-right:1px solid var(--border);
+    backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);
+    transition:width .25s,transform .25s}
+  .sb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:4px 6px}
+  .sb-brand{font-weight:800;font-size:1.05rem;white-space:nowrap;overflow:hidden}
+  .sb-collapse{background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:8px;
+    width:28px;height:28px;cursor:pointer;flex-shrink:0;transition:.15s}
+  .sb-collapse:hover{color:var(--text)}
+  #nav{display:flex;flex-direction:column;gap:6px}
+  #nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+    background:transparent;color:var(--muted);border:1px solid transparent;border-radius:12px;
+    padding:11px 12px;cursor:pointer;font-size:.88rem;font-weight:600;transition:.18s;white-space:nowrap;overflow:hidden}
+  #nav button:hover{color:var(--text);background:var(--card2)}
+  #nav button.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 0 18px var(--glow)}
+  #nav .ico{font-size:1.05rem;width:22px;text-align:center;flex-shrink:0}
+  body.sb-min #sidebar{width:64px}
+  body.sb-min .lbl{display:none}
+  body.sb-min .sb-top{flex-direction:column;gap:10px;justify-content:center}
+  body.sb-min .wrap{margin-left:84px}
+  .sb-burger{display:none}
+  @media(max-width:760px){
+    #sidebar{transform:translateX(-105%);width:230px}
+    body.sb-open #sidebar{transform:none}
+    body.sb-min #sidebar{width:230px}
+    body.sb-min .lbl{display:inline}
+    .wrap{margin-left:0!important;padding:16px 14px 80px}
+    .sb-burger{display:inline-block}
+  }
+  .card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:14px;
+    backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6);
+    box-shadow:0 8px 32px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.09);
+    animation:rise .45s cubic-bezier(.2,.7,.3,1) both}
+  .card h2{font-size:1.05rem;margin-bottom:12px}
+  .card h3{font-size:.95rem;margin-bottom:8px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+  .bar-row{margin-bottom:12px}
+  .bar-label{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px}
+  .bar-label .pct{color:var(--muted)}
+  .bar{height:8px;background:rgba(10,15,26,.5);border-radius:5px;overflow:hidden}
+  .bar>div{height:100%;border-radius:5px;transition:width .4s}
+  .btn{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--accent-ink);border:none;border-radius:12px;padding:12px 20px;
+    font-size:.95rem;font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s,filter .15s}
+  .btn:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 6px 20px var(--glow)}
+  .btn::after{content:"";position:absolute;top:0;left:-75%;width:50%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg)}
+  .btn:hover::after{left:125%;transition:left .55s ease}
+  .btn.secondary{background:var(--card2);border:1px solid var(--border);color:var(--text);
+    backdrop-filter:blur(12px) saturate(1.5);-webkit-backdrop-filter:blur(12px) saturate(1.5)}
+  .btn.small{padding:8px 14px;font-size:.83rem}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .pill{display:inline-block;background:var(--card2);border:1px solid var(--border);border-radius:14px;
+    padding:3px 10px;font-size:.72rem;color:var(--muted);margin-right:6px}
+  .gap-item{display:flex;justify-content:space-between;align-items:center;background:var(--card2);
+    border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:.87rem}
+  .gap-item .score{font-weight:700}
+  .focus-item{display:flex;align-items:center;gap:12px;background:var(--card2);border:1px solid var(--border);
+    border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:.15s;user-select:none}
+  .focus-item:hover{border-color:var(--accent)}
+  .focus-item.on{border-color:var(--accent);background:#1d2c48}
+  .focus-item .check{width:20px;height:20px;border-radius:6px;border:2px solid var(--muted);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--accent-ink)}
+  .focus-item.on .check{background:var(--accent);border-color:var(--accent)}
+  .focus-item .meta{font-size:.75rem;color:var(--muted)}
+  .qnum{color:var(--muted);font-size:.8rem;margin-bottom:8px}
+  .question{font-size:1.02rem;line-height:1.5;margin-bottom:16px;font-weight:600}
+  .opt{display:block;width:100%;text-align:left;background:var(--card2);border:1px solid var(--border);
+    color:var(--text);border-radius:10px;padding:13px 15px;margin-bottom:9px;cursor:pointer;
+    font-size:.92rem;line-height:1.4;transition:.15s}
+  .opt:hover:not(:disabled){border-color:var(--accent)}
+  .opt.correct{border-color:var(--good);background:rgba(61,220,132,.12)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,93,108,.12)}
+  .opt:disabled{cursor:default}
+  .explain{background:rgba(10,15,26,.5);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;
+    padding:12px 15px;font-size:.87rem;line-height:1.55;color:#c4cdda;margin:10px 0 14px}
+  .result-big{font-size:2.6rem;font-weight:800;text-align:center;margin:10px 0}
+  .center{text-align:center}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .muted{color:var(--muted);font-size:.85rem;line-height:1.5}
+  .stat-line{display:flex;justify-content:space-between;font-size:.87rem;padding:7px 0;border-bottom:1px solid var(--border)}
+  .stat-line:last-child{border-bottom:none}
+  .tag{font-size:.7rem;font-weight:700;border-radius:6px;padding:2px 7px;margin-left:8px}
+  .tag.c1{background:rgba(79,142,247,.2);color:var(--accent)}
+  .tag.c2{background:rgba(124,92,252,.2);color:var(--accent2)}
+  ul.plain{list-style:none}
+  ul.plain li{padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem;line-height:1.5}
+  ul.plain li:last-child{border-bottom:none}
+  ul.plain li b{color:var(--accent)}
+  .danger{color:var(--bad)}
+  /* ---- modal ---- */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50}
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;max-width:440px;width:92%}
+  .modal input,.modal select{width:100%;background:rgba(10,15,26,.5);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:10px 12px;font-size:.9rem;margin:6px 0 12px}
+  /* ---- chat ---- */
+  .chat-box{background:rgba(10,15,26,.5);border:1px solid var(--border);border-radius:10px;padding:12px;max-height:420px;overflow-y:auto;margin-bottom:10px}
+  .msg{max-width:88%;border-radius:12px;padding:10px 13px;margin-bottom:8px;font-size:.88rem;line-height:1.55;white-space:pre-wrap}
+  .msg.user{background:var(--accent);color:var(--accent-ink);margin-left:auto}
+  .msg.ai{background:var(--card2);border:1px solid var(--border)}
+  .msg.think{color:var(--muted);font-style:italic;background:none;border:none}
+  .chat-input{display:flex;gap:8px}
+  .chat-input input{flex:1;background:rgba(10,15,26,.5);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px 13px;font-size:.9rem}
+  /* ---- labs hub ---- */
+  .lab-tile{display:flex;gap:14px;align-items:center;background:var(--card2);border:1px solid var(--border);
+    border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:.15s}
+  .lab-tile:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .lab-tile .ico{font-size:1.7rem}
+  .lab-tile .meta{font-size:.78rem;color:var(--muted);margin-top:2px}
+  /* ---- pbq ---- */
+  .pbq-slot{display:flex;align-items:center;gap:10px;background:rgba(10,15,26,.5);border:1px dashed var(--border);
+    border-radius:9px;padding:10px 13px;margin-bottom:7px;min-height:42px;font-size:.88rem;cursor:pointer}
+  .pbq-slot.filled{border-style:solid;background:var(--card2)}
+  .pbq-slot.ok{border-color:var(--good)} .pbq-slot.bad{border-color:var(--bad)}
+  .pbq-slot .n{color:var(--muted);font-weight:700;width:20px}
+  .pbq-pool{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .pbq-chip{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 13px;
+    font-size:.86rem;cursor:pointer;transition:.12s;user-select:none}
+  .pbq-chip:hover{border-color:var(--accent)}
+  .wire{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:7px;border:1px solid #0008}
+  /* ---- terminal ---- */
+  .term{background:#0a0e14;border:1px solid var(--border);border-radius:10px;padding:14px;
+    font-family:'Cascadia Mono','Consolas',monospace;font-size:.82rem;line-height:1.5;height:380px;overflow-y:auto;color:#c9d4e3}
+  .term .cmd{color:#7ee787}.term .err{color:var(--bad)}.term .ok{color:var(--good)}.term .sys{color:var(--warn)}
+  .term-input{display:flex;gap:0;margin-top:8px;background:#0a0e14;border:1px solid var(--border);border-radius:10px;padding:8px 12px;
+    font-family:'Cascadia Mono','Consolas',monospace}
+  .term-input span{color:#7ee787;font-size:.85rem;padding-top:2px}
+  .term-input input{flex:1;background:none;border:none;outline:none;color:#e8ecf4;font-family:inherit;font-size:.85rem;padding-left:8px}
+  /* ---- pc builder ---- */
+  .mobo{position:relative;background:linear-gradient(145deg,#14331d,#0d2414);border:2px solid #2c5238;border-radius:12px;
+    height:430px;margin-bottom:12px;overflow:hidden}
+  .zone{position:absolute;border:2px dashed #4a7a5a;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-size:.68rem;color:#9fc9ac;text-align:center;padding:4px;transition:.15s;cursor:pointer}
+  .zone.hot{border-color:var(--warn);background:rgba(255,184,77,.12)}
+  .zone.done{border-style:solid;border-color:var(--good);background:rgba(61,220,132,.15);color:var(--good);font-weight:700}
+  .parts{display:flex;flex-wrap:wrap;gap:8px}
+  .part{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 13px;font-size:.85rem;cursor:grab;user-select:none}
+  .part.sel{border-color:var(--warn);background:rgba(255,184,77,.12)}
+  .part.used{opacity:.35;pointer-events:none}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .shake{animation:shake .25s 2}
+  /* ---- 3d lab ---- */
+  #c3d{width:100%;height:340px;border-radius:10px;background:radial-gradient(circle at 50% 40%,#1c2536,#0c111c);touch-action:none;cursor:grab}
+  .conn-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+  .conn-chips button{background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:16px;
+    padding:6px 13px;font-size:.8rem;cursor:pointer;font-weight:600}
+  .conn-chips button.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .spec-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.85rem}
+  .spec-grid dt{color:var(--muted)}.spec-grid dd{margin:0}
+  /* ---- settings ---- */
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:14px;
+    padding:6px 13px;font-size:.8rem;cursor:pointer;font-weight:600}
+  .seg button.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .set-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    padding:12px 0;border-bottom:1px solid var(--border)}
+  .set-row:last-child{border-bottom:none}
+  .inp{background:rgba(10,15,26,.5);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-size:.88rem}
+  .opt.sel{border-color:var(--accent)}
+  /* ---- light theme ---- */
+  body.light{--bg:#e6ecf6;--card:rgba(255,255,255,.6);--card2:rgba(255,255,255,.55);--border:rgba(30,45,80,.16);--text:#1d2536;--muted:#67718a;
+    --accent:#4f8ef7;--accent2:#7c5cfc;--accent-ink:#fff;--glow:rgba(79,142,247,.4)}
+  body.light .bar{background:#e2e8f2}
+  body.light .explain{background:#f2f5fb;color:#3a4356}
+  body.light .chat-box{background:#f7f9fc}
+  body.light .inp,body.light .chat-input input,body.light .modal input,body.light .modal select{background:#fff}
+  body.light .pbq-slot{background:#f7f9fc}
+  body.light #c3d{background:radial-gradient(circle at 50% 40%,#dfe7f3,#c2cfe3)}
+  /* ---- liquid glass: blobs & motion ---- */
+  .bg-blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+  .blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.55;animation:drift 20s ease-in-out infinite alternate}
+  .b1{width:46vw;height:46vw;background:#232327;top:-12%;left:-12%}
+  .b2{width:40vw;height:40vw;background:#3c2874;bottom:-18%;right:-10%;opacity:.3;animation-duration:26s;animation-delay:-8s}
+  .b3{width:30vw;height:30vw;background:#1b1b1f;top:42%;left:56%;animation-duration:32s;animation-delay:-15s}
+  body.light .blob{opacity:.4}
+  body.light .b1{background:#9dbcf5}
+  body.light .b2{background:#c4b2f7}
+  body.light .b3{background:#9ad3f2}
+  @keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(7vw,-5vh) scale(1.18)}}
+  @keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+  #app>.card:nth-child(2){animation-delay:.07s}
+  #app>.card:nth-child(3){animation-delay:.14s}
+  #app>.card:nth-child(4){animation-delay:.21s}
+  #app>.card:nth-child(5){animation-delay:.28s}
+  .grid2 .card{animation-delay:.14s}
+  .result-big{animation:pop .5s cubic-bezier(.2,.7,.3,1) both}
+  .overlay{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .lab-tile,.focus-item,.pbq-chip,.part{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .lab-tile:hover{box-shadow:0 8px 24px var(--glow)}
+  .opt{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .opt:hover:not(:disabled){transform:translateY(-1px)}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+  /* ---- reference-inspired refinements (Fleek / Fey / Quadrata) ---- */
+  .card{border-radius:20px;box-shadow:0 12px 44px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
+  header h1{letter-spacing:-.02em;font-weight:800}
+  .card h2{letter-spacing:-.01em;font-weight:700}
+  .sub,.qnum{text-transform:uppercase;letter-spacing:.14em;font-size:.66rem;
+    font-family:'Cascadia Mono','Consolas',monospace;color:var(--muted)}
+  .pill,.tag{text-transform:uppercase;letter-spacing:.09em;font-size:.62rem;font-weight:700;
+    font-family:'Cascadia Mono','Consolas',monospace;border-radius:999px}
+  .btn{border-radius:999px;text-transform:uppercase;letter-spacing:.09em;font-size:.78rem;font-weight:700;padding:13px 24px}
+  .btn.small{padding:9px 16px;font-size:.68rem}
+  .btn.secondary{background:transparent;border:1px solid var(--border)}
+  .btn.secondary:hover{border-color:var(--text);box-shadow:none}
+  .seg button,.conn-chips button{border-radius:999px}
+  .lab-tile,.focus-item{border-radius:16px}
+  .bar{height:6px}
+  #nav button{border-radius:999px}
+  .result-big{font-weight:800;letter-spacing:-.03em}
+  .sb-brand{letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+  /* ---- logo badge ---- */
+  .logo-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:10px;
+    background:linear-gradient(150deg,#1d1d24,#0b0b0e);border:1px solid var(--border);flex-shrink:0;
+    animation:logoGlow 3.5s ease-in-out infinite}
+  .logo-badge.sm{width:26px;height:26px;border-radius:8px}
+  .logo-txt{font-weight:800;font-size:.78rem;letter-spacing:-.02em;
+    background:linear-gradient(120deg,#f4f4f5 20%,#8b5cf6 50%,#f4f4f5 80%);background-size:220% auto;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:sheenText 4s linear infinite}
+  .logo-badge.sm .logo-txt{font-size:.64rem}
+  @keyframes sheenText{to{background-position:220% center}}
+  @keyframes logoGlow{50%{box-shadow:0 0 16px rgba(139,92,246,.35)}}
+  /* ---- animated nav icons ---- */
+  #nav .ico{display:flex;align-items:center;justify-content:center}
+  #nav .ico svg{width:19px;height:19px;transition:transform .25s}
+  #nav svg *{transform-box:fill-box;transform-origin:center}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes eq{50%{transform:scaleY(.5)}}
+  @keyframes bubble{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-7px);opacity:0}}
+  @keyframes twinkle{50%{opacity:.15;transform:scale(.6)}}
+  @keyframes ringPing{70%{transform:scale(1.14);opacity:.35}100%{transform:scale(1.2);opacity:0}}
+  #nav button:hover .ic-set{transform:rotate(70deg)}
+  #nav button.active .ic-set{animation:spin 7s linear infinite}
+  #nav button:hover .ic-quiz{transform:rotate(-10deg) translateY(-1px)}
+  #nav button:hover .ic-grow{transform:translate(1px,-2px)}
+  #nav button:hover .ic-labs{transform:rotate(-7deg)}
+  #nav button.active .ic-labs .bub{animation:bubble 1.5s ease-in infinite}
+  #nav button.active .ic-dash rect{transform-origin:center 90%;animation:eq 1.5s ease-in-out infinite}
+  #nav button.active .ic-dash rect:nth-of-type(2){animation-delay:.2s}
+  #nav button.active .ic-dash rect:nth-of-type(3){animation-delay:.4s}
+  #nav button.active .ic-ai .spk{animation:twinkle 1.4s ease-in-out infinite}
+  #nav button:hover .ic-focus .ring,#nav button.active .ic-focus .ring{animation:ringPing 1.3s ease-out infinite}
+  /* ---- inline UI icons ---- */
+  .ui-ic{width:1.05em;height:1.05em;vertical-align:-.15em;display:inline-block}
+  .card h2 .ui-ic{margin-right:8px;opacity:.9}
+  .lab-tile .ico .ui-ic{width:24px;height:24px;color:var(--muted)}
+  .lab-tile:hover .ico .ui-ic{color:var(--text)}
+  .seg .ui-ic{width:.95em;height:.95em;margin-right:4px}
+  .part .ui-ic{margin-right:5px;color:var(--muted)}
+  /* ---- liquid glass v2: prismatic rings & knobs (iOS-glass style) ---- */
+  @keyframes irisSpin{to{transform:rotate(360deg)}}
+  @keyframes hueShift{from{filter:blur(.7px) saturate(1.6) hue-rotate(0)}to{filter:blur(.7px) saturate(1.6) hue-rotate(360deg)}}
+  .card{background-image:linear-gradient(180deg,rgba(255,255,255,.035),transparent 45%)}
+  #nav button{padding:8px 10px;border-radius:999px}
+  #nav .ico{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.05);position:relative;flex-shrink:0;
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.10),inset 0 -2px 5px rgba(0,0,0,.45)}
+  #nav .ico svg{width:17px;height:17px}
+  #nav button.active{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15);color:#fff;
+    box-shadow:0 8px 20px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.10)}
+  #nav button.active .ico{background:rgba(0,0,0,.4)}
+  #nav button.active .ico::before{content:"";position:absolute;inset:-3px;border-radius:50%;
+    background:conic-gradient(from 0deg,#ff5d6c,#ffb84d,#3ddc84,#4fc3f7,#7c5cfc,#ff5d6c);
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 2.5px));
+    mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 2.5px));
+    filter:blur(.6px) saturate(1.6);animation:irisSpin 4s linear infinite}
+  body.light #nav button.active{background:rgba(255,255,255,.92);color:#1d2536;box-shadow:0 6px 18px rgba(30,45,80,.18)}
+  body.light #nav button.active .ico{background:rgba(30,45,80,.08)}
+  .logo-badge{position:relative;animation:none}
+  .logo-badge::after{content:"";position:absolute;inset:-2.5px;border-radius:12px;padding:2.5px;
+    background:conic-gradient(from 0deg,#ff5d6c,#ffb84d,#3ddc84,#4fc3f7,#7c5cfc,#ff5d6c);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+    opacity:.9;animation:hueShift 5s linear infinite}
+  .logo-badge.sm::after{inset:-2px;padding:2px;border-radius:10px}
+  .btn::before{content:"";position:absolute;inset:0;border-radius:999px;padding:2px;
+    background:conic-gradient(from 0deg,#ff5d6c,#ffb84d,#3ddc84,#4fc3f7,#7c5cfc,#ff5d6c);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+    filter:blur(1px) saturate(1.6);opacity:0;transition:opacity .25s;pointer-events:none}
+  .btn:hover::before{opacity:1}
+  /* ---- glass v3: specular shine + thin chromatic fringes (AI-Mode pill style) ---- */
+  .card{box-shadow:0 12px 44px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.10);
+    background-image:radial-gradient(120% 70% at 18% 0%,rgba(255,255,255,.065),transparent 55%)}
+  .btn{box-shadow:0 2px 6px rgba(0,0,0,.45),0 12px 26px rgba(0,0,0,.3),inset 0 1px 1px rgba(255,255,255,.75)}
+  .btn.secondary{box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  #nav button.active{background-image:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.02) 60%)}
+  #nav .ico{box-shadow:inset 0 1.5px 1.5px rgba(255,255,255,.14),inset 0 -2px 5px rgba(0,0,0,.5)}
+  #nav button.active .ico svg{filter:drop-shadow(.6px 0 rgba(255,90,90,.5)) drop-shadow(-.6px 0 rgba(90,150,255,.5))}
+  #nav button.active .ico::before{
+    background:conic-gradient(from 0deg,transparent 0deg 38deg,#ff5d6c 42deg,#ffb84d 47deg,#4fc3f7 53deg,transparent 58deg 148deg,#7c5cfc 152deg,#3ddc84 157deg,transparent 162deg 298deg,#ffb84d 302deg,#ff5d6c 306deg,transparent 310deg 360deg);
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.2px));
+    mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.2px));
+    filter:blur(.4px) saturate(1.7);animation:irisSpin 6s linear infinite}
+  .logo-badge::after{inset:-1.5px;padding:1.5px;
+    background:conic-gradient(from 0deg,transparent 0 40deg,#ff5d6c 44deg,#ffb84d 49deg,#4fc3f7 55deg,transparent 60deg 200deg,#7c5cfc 204deg,#3ddc84 209deg,transparent 214deg 360deg);
+    filter:blur(.4px) saturate(1.7);opacity:1;animation:hueShift 6s linear infinite}
+  .logo-badge.sm::after{inset:-1.5px;padding:1.5px}
+  .logo-txt{background:linear-gradient(115deg,#eef0f4 0%,#aabdff 30%,#d4b3ff 48%,#f0f0f2 62%,#ffd9a6 82%,#eef0f4 100%);
+    background-size:220% auto;-webkit-background-clip:text;background-clip:text}
+  .btn::before{padding:1.5px;
+    background:conic-gradient(from 20deg,transparent 0 60deg,#ff5d6c 64deg,#ffb84d 69deg,#4fc3f7 75deg,transparent 80deg 210deg,#7c5cfc 214deg,#3ddc84 219deg,transparent 224deg 360deg);
+    filter:blur(.5px) saturate(1.7)}
+  /* ---- glass v3.1: cleanup — fringe on pill edge, clean bright knob ---- */
+  #nav button{position:relative}
+  #nav button.active .ico::before{display:none}
+  #nav button.active .ico svg{filter:none}
+  #nav button.active .ico{background:rgba(255,255,255,.12);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.22),inset 0 -1.5px 3px rgba(0,0,0,.25)}
+  #nav button.active::before{content:"";position:absolute;inset:-1px;border-radius:999px;padding:1.2px;
+    background:conic-gradient(from 200deg,transparent 0 30deg,#ff5d6c 34deg,#ffb84d 38deg,#4fc3f7 43deg,transparent 48deg 175deg,#7c5cfc 179deg,#3ddc84 183deg,#ffb84d 187deg,transparent 191deg 360deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+    filter:blur(.4px) saturate(1.6);opacity:.9;animation:hueShift 7s linear infinite;pointer-events:none}
+  .logo-badge::after{opacity:.75;filter:blur(.3px) saturate(1.5)}
+  /* ---- glass v3.2: bright fringe with bloom (visible on black) ---- */
+  @keyframes fringeHue{from{filter:blur(.5px) saturate(1.6) drop-shadow(0 0 5px rgba(190,170,255,.55)) hue-rotate(0)}
+    to{filter:blur(.5px) saturate(1.6) drop-shadow(0 0 5px rgba(190,170,255,.55)) hue-rotate(360deg)}}
+  #nav button.active::before{inset:-1.5px;padding:2.2px;opacity:1;
+    background:conic-gradient(from 210deg,
+      rgba(255,255,255,.9) 0deg,#ff5d6c 28deg,#ffb84d 62deg,rgba(255,255,255,.95) 92deg,#4fc3f7 124deg,#7c5cfc 158deg,
+      rgba(255,255,255,.85) 188deg,#3ddc84 220deg,#4fc3f7 252deg,rgba(255,255,255,.95) 284deg,#ffb84d 316deg,#ff5d6c 344deg,rgba(255,255,255,.9) 360deg);
+    animation:fringeHue 7s linear infinite}
+  .logo-badge::after{inset:-2px;padding:2px;opacity:.95;
+    background:conic-gradient(from 0deg,
+      rgba(255,255,255,.9) 0deg,#ffb84d 45deg,#ff5d6c 90deg,rgba(255,255,255,.9) 135deg,#7c5cfc 180deg,#4fc3f7 225deg,
+      rgba(255,255,255,.85) 270deg,#3ddc84 315deg,rgba(255,255,255,.9) 360deg);
+    animation:fringeHue 8s linear infinite}
+  body.light #nav button.active::before,body.light .logo-badge::after{animation:hueShift 7s linear infinite;opacity:.8}
+  /* ---- glass v3.4: edge shimmer glint + rainbow woven into text, logo ring removed ---- */
+  .logo-badge::after{display:none}
+  @property --ga{syntax:"<angle>";inherits:false;initial-value:0deg}
+  @keyframes glintSpin{to{--ga:360deg}}
+  #nav button.active::after{content:"";position:absolute;inset:-1.5px;border-radius:999px;padding:2.2px;
+    background:conic-gradient(from var(--ga),transparent 0 315deg,rgba(255,255,255,.3) 330deg,#fff 345deg,rgba(255,255,255,.3) 356deg,transparent 360deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+    filter:blur(.5px);animation:glintSpin 2.8s linear infinite;pointer-events:none}
+  header h1,.sb-brand .lbl,.logo-txt{
+    background:linear-gradient(110deg,#f4f4f5 30%,#ff5d6c 42%,#ffb84d 48%,#3ddc84 53%,#4fc3f7 58%,#7c5cfc 64%,#f4f4f5 76%);
+    background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:sheenText 6s linear infinite}
+  body.light header h1,body.light .sb-brand .lbl,body.light .logo-txt{
+    background:linear-gradient(110deg,#1d2536 30%,#ff5d6c 44%,#ffb84d 50%,#4f8ef7 56%,#7c5cfc 62%,#1d2536 76%);
+    background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* ---- glass v3.5: more movement everywhere ---- */
+  @property --fa{syntax:"<angle>";inherits:false;initial-value:0deg}
+  @keyframes fringeSpin{to{--fa:360deg}}
+  #nav button.active::before{
+    background:conic-gradient(from calc(210deg + var(--fa)),
+      rgba(255,255,255,.9) 0deg,#ff5d6c 28deg,#ffb84d 62deg,rgba(255,255,255,.95) 92deg,#4fc3f7 124deg,#7c5cfc 158deg,
+      rgba(255,255,255,.85) 188deg,#3ddc84 220deg,#4fc3f7 252deg,rgba(255,255,255,.95) 284deg,#ffb84d 316deg,#ff5d6c 344deg,rgba(255,255,255,.9) 360deg);
+    animation:fringeSpin 9s linear infinite,fringeHue 7s linear infinite}
+  header h1,.sb-brand .lbl,.logo-txt{animation-duration:3.2s}
+  @keyframes pillBreath{50%{transform:scale(1.012)}}
+  #nav button.active{animation:pillBreath 4.5s ease-in-out infinite}
+  @keyframes drift{0%{transform:translate(0,0) scale(1) rotate(0)}100%{transform:translate(9vw,-7vh) scale(1.22) rotate(18deg)}}
+  .blob{animation-duration:14s}
+  .card{transition:transform .3s,box-shadow .3s}
+  .card:hover{transform:translateY(-2px)}
+  .lab-tile:hover{transform:translateY(-3px)}
+  .bar{position:relative}
+  .bar>div{position:relative;overflow:hidden}
+  .bar>div::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.3) 50%,transparent 65%);
+    background-size:220% 100%;animation:barSheen 2.6s linear infinite}
+  @keyframes barSheen{from{background-position:120% 0}to{background-position:-120% 0}}
+  /* ---- v3.6: rainbow text on sidebar tabs, slower sweep everywhere ---- */
+  header h1,.sb-brand .lbl,.logo-txt{animation-duration:10s}
+  #nav button .lbl{
+    background:linear-gradient(110deg,#9a9aa3 30%,#ff5d6c 42%,#ffb84d 48%,#3ddc84 53%,#4fc3f7 58%,#7c5cfc 64%,#9a9aa3 76%);
+    background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:sheenText 10s linear infinite}
+  #nav button:hover .lbl,#nav button.active .lbl{
+    background:linear-gradient(110deg,#f4f4f5 30%,#ff5d6c 42%,#ffb84d 48%,#3ddc84 53%,#4fc3f7 58%,#7c5cfc 64%,#f4f4f5 76%);
+    background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent}
+  body.light #nav button .lbl{
+    background:linear-gradient(110deg,#67718a 30%,#ff5d6c 44%,#ffb84d 50%,#4f8ef7 56%,#7c5cfc 62%,#67718a 76%);
+    background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent}
+  body.light #nav button:hover .lbl,body.light #nav button.active .lbl{
+    background:linear-gradient(110deg,#1d2536 30%,#ff5d6c 44%,#ffb84d 50%,#4f8ef7 56%,#7c5cfc 62%,#1d2536 76%);
+    background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* ---- v3.7: rainbow text ONLY in the logo ---- */
+  #nav button .lbl,#nav button:hover .lbl,#nav button.active .lbl,
+  header h1,.sb-brand .lbl,
+  body.light #nav button .lbl,body.light #nav button:hover .lbl,body.light #nav button.active .lbl,
+  body.light header h1,body.light .sb-brand .lbl{
+    background:none;-webkit-background-clip:border-box;background-clip:border-box;
+    color:inherit;animation:none}
+  header h1,.sb-brand .lbl{color:var(--text)}
+  #nav button .lbl{color:var(--muted)}
+  #nav button:hover .lbl,#nav button.active .lbl{color:inherit}
+  .logo-txt,body.light .logo-txt{
+    background:linear-gradient(110deg,#f4f4f5 28%,#ff5d6c 40%,#ffb84d 47%,#3ddc84 53%,#4fc3f7 59%,#7c5cfc 66%,#f4f4f5 78%);
+    background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:sheenText 10s linear infinite}
+  /* ---- v3.8: slightly thinner edge fringe ---- */
+  #nav button.active::before{inset:-1px;padding:1.7px}
+  #nav button.active::after{inset:-1px;padding:1.7px}
+</style>
+</head>
+<body>
+<div class="bg-blobs"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<aside id="sidebar">
+  <div class="sb-top">
+    <span class="sb-brand"><span class="logo-badge"><span class="logo-txt">A+</span></span><span class="lbl">Study Hub</span></span>
+    <button class="sb-collapse" id="sb-col" onclick="toggleSb()" title="Collapse sidebar">⟨</button>
+  </div>
+  <nav id="nav"></nav>
+</aside>
+<div class="wrap">
+  <header>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn small secondary sb-burger" onclick="sbOpen=!sbOpen;render()">☰</button>
+      <div>
+        <h1 style="display:flex;align-items:center;gap:10px"><span class="logo-badge sm"><span class="logo-txt">A+</span></span>Study Hub</h1>
+        <div class="sub">CompTIA A+ · Core 1 (220-1201) &amp; Core 2 (220-1202)</div>
+      </div>
+    </div>
+  </header>
+  <div id="app"></div>
+</div>
+<div id="modal-root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ================= DOMAINS ================= */
+const DOMAINS = [
+  {id:"mobile",  core:1, name:"Mobile Devices",                    weight:15},
+  {id:"net",     core:1, name:"Networking",                        weight:20},
+  {id:"hw",      core:1, name:"Hardware",                          weight:25},
+  {id:"cloud",   core:1, name:"Virtualization & Cloud",            weight:11},
+  {id:"hwts",    core:1, name:"HW & Network Troubleshooting",      weight:29},
+  {id:"os",      core:2, name:"Operating Systems",                 weight:30},
+  {id:"sec",     core:2, name:"Security",                          weight:27},
+  {id:"swts",    core:2, name:"Software Troubleshooting",          weight:26},
+  {id:"ops",     core:2, name:"Operational Procedures",            weight:17},
+];
+
+/* ================= QUESTION BANK =================
+   q: question, o: options, a: index of correct, e: explanation */
+const QUESTIONS = [
+/* ---- Mobile Devices (Core 1, 15%) ---- */
+{d:"mobile",q:"What type of RAM module is used in most laptops?",o:["DIMM","SO-DIMM","ECC RDIMM","SIMM"],a:1,e:"Laptops use SO-DIMM (Small Outline DIMM) — a physically smaller module than the full-size DIMMs in desktops."},
+{d:"mobile",q:"A user wants email on their phone to stay synchronized with the server so messages read on the phone show as read everywhere. Which protocol should be used?",o:["POP3","SMTP","IMAP","FTP"],a:2,e:"IMAP keeps mail on the server and syncs state across devices. POP3 downloads (and typically deletes) mail locally. SMTP only sends mail."},
+{d:"mobile",q:"Which technology lets a company enforce passcodes, push apps, and remotely wipe employee smartphones?",o:["VPN","MDM","NFC","DRM"],a:1,e:"Mobile Device Management (MDM) is the enterprise tool for enforcing policy, deploying apps, and remote-wiping managed devices."},
+{d:"mobile",q:"A phone's screen displays correctly but doesn't respond to touch. Which component has most likely failed?",o:["The LCD panel","The digitizer","The GPU","The inverter"],a:1,e:"The digitizer is the touch-sensing layer. If the image is fine but touch fails, the digitizer is the likely culprit; a broken LCD would show display artifacts."},
+{d:"mobile",q:"Which feature allows a modern smartphone to activate cellular service without a physical SIM card?",o:["NFC","eSIM","IMEI","MicroSD"],a:1,e:"An eSIM is an embedded, reprogrammable SIM. Carriers provision it digitally — no physical card needed. New on the 220-1201."},
+{d:"mobile",q:"Which wireless technology is used for tap-to-pay transactions?",o:["Bluetooth","NFC","Wi-Fi Direct","IR"],a:1,e:"NFC (Near Field Communication) works over a few centimeters and powers contactless payment like Apple Pay and Google Wallet."},
+{d:"mobile",q:"A user needs internet on their laptop while traveling and only has their smartphone. What feature should they use?",o:["Airplane mode","Bluetooth pairing","Hotspot/tethering","NFC beam"],a:2,e:"A mobile hotspot (tethering) shares the phone's cellular data connection with other devices over Wi-Fi, USB, or Bluetooth."},
+{d:"mobile",q:"Which laptop display technology offers the best contrast and true blacks by lighting each pixel individually?",o:["TN","IPS","OLED","CCFL"],a:2,e:"OLED pixels emit their own light and can turn fully off, giving perfect blacks. IPS offers good color/viewing angles but uses a backlight; TN is fastest but worst colors."},
+{d:"mobile",q:"A company phone is lost. What should be done FIRST to protect corporate data?",o:["Change the Wi-Fi password","Issue a remote wipe","Call the carrier for a new SIM","File a police report"],a:1,e:"Remote wipe (via MDM or find-my-device) immediately protects the data. Everything else can follow."},
+{d:"mobile",q:"Which connector is standard for charging and data on modern Android phones and newer iPhones?",o:["Lightning","Micro-USB","USB-C","Mini-USB"],a:2,e:"USB-C is now the universal standard — the EU mandate moved iPhone from Lightning to USB-C as well."},
+
+/* ---- Networking (Core 1, 20%) ---- */
+{d:"net",q:"Which port does HTTPS use?",o:["80","110","443","3389"],a:2,e:"HTTPS uses TCP 443. HTTP is 80, POP3 is 110, RDP is 3389. Port numbers are heavily tested — memorize the table."},
+{d:"net",q:"Which port is used by SSH?",o:["21","22","23","25"],a:1,e:"SSH uses TCP 22. FTP is 20/21, Telnet is 23 (insecure), SMTP is 25."},
+{d:"net",q:"A workstation shows an IP address of 169.254.10.15. What does this indicate?",o:["A static IP was assigned","DHCP failed — APIPA address","The DNS server is down","The subnet mask is wrong"],a:1,e:"169.254.x.x is APIPA — Windows self-assigns it when no DHCP server responds. Classic exam question."},
+{d:"net",q:"Which service translates domain names like google.com into IP addresses?",o:["DHCP","DNS","NAT","SNMP"],a:1,e:"DNS resolves names to IPs (port 53). DHCP assigns addresses; NAT translates private↔public addresses."},
+{d:"net",q:"Which 802.11 standard is marketed as Wi-Fi 6?",o:["802.11n","802.11ac","802.11ax","802.11g"],a:2,e:"802.11ax = Wi-Fi 6 (and 6E on the 6 GHz band). 802.11ac = Wi-Fi 5, 802.11n = Wi-Fi 4."},
+{d:"net",q:"Which wireless encryption standard is currently the most secure?",o:["WEP","WPA","WPA2","WPA3"],a:3,e:"WPA3 is the latest and strongest, adding SAE handshakes. WEP and WPA are broken; WPA2 is the widespread minimum."},
+{d:"net",q:"Which cable category supports 10 Gbps up to 100 meters?",o:["Cat5","Cat5e","Cat6","Cat6a"],a:3,e:"Cat6a handles 10GBASE-T at the full 100 m. Cat6 does 10 Gbps only to ~55 m; Cat5e tops out at 1 Gbps."},
+{d:"net",q:"Which fiber type is used for long-distance runs, using a laser light source?",o:["Multimode (MMF)","Single-mode (SMF)","Coaxial","Twinaxial"],a:1,e:"Single-mode fiber has a tiny core and laser source for long distances (kilometers). Multimode uses LEDs for shorter, cheaper runs."},
+{d:"net",q:"Which device connects multiple devices on a LAN and forwards frames based on MAC addresses?",o:["Hub","Router","Switch","Modem"],a:2,e:"A switch learns MAC addresses and forwards intelligently. A hub blindly repeats to all ports; a router forwards between networks using IP addresses."},
+{d:"net",q:"What technology lets many devices on a private network share one public IP address?",o:["DHCP","DNS","NAT","VLAN"],a:2,e:"Network Address Translation (NAT) maps private internal addresses to a public one at the router — how home networks reach the internet."},
+{d:"net",q:"Which port does RDP (Remote Desktop Protocol) use?",o:["22","53","143","3389"],a:3,e:"RDP uses TCP 3389. SSH 22, DNS 53, IMAP 143."},
+
+/* ---- Hardware (Core 1, 25%) ---- */
+{d:"hw",q:"Which RAID level mirrors data across two drives with no striping?",o:["RAID 0","RAID 1","RAID 5","RAID 10"],a:1,e:"RAID 1 = mirroring (redundancy, half capacity). RAID 0 = striping (speed, no redundancy). RAID 5 = striping with parity (3+ drives). RAID 10 = mirror + stripe (4+ drives)."},
+{d:"hw",q:"Which RAID level requires at least three drives and uses distributed parity?",o:["RAID 0","RAID 1","RAID 5","RAID 10"],a:2,e:"RAID 5 stripes data with parity across 3+ drives and can survive one drive failure. RAID 10 needs 4 drives; RAID 0/1 need 2."},
+{d:"hw",q:"Which storage interface offers the fastest speeds for an M.2 SSD?",o:["SATA III","NVMe (PCIe)","IDE","SCSI"],a:1,e:"NVMe runs over PCIe lanes and vastly outperforms SATA III (~600 MB/s cap). An M.2 slot may carry either — NVMe is the fast one."},
+{d:"hw",q:"Which PCIe slot size is standard for installing a graphics card?",o:["x1","x4","x8","x16"],a:3,e:"GPUs use PCIe x16 slots for maximum bandwidth. x1/x4 slots host NICs, sound cards, and other low-bandwidth cards."},
+{d:"hw",q:"In a laser printer, which component melts toner onto the paper?",o:["Drum","Transfer belt","Fuser assembly","Pickup roller"],a:2,e:"The fuser uses heat and pressure to bond toner to paper — which is why pages exit warm, and why smearing that wipes off points to a fuser fault."},
+{d:"hw",q:"What is the correct order of the laser printing process?",o:["Charging, exposing, processing, developing, transferring, fusing, cleaning","Processing, charging, exposing, developing, transferring, fusing, cleaning","Exposing, charging, developing, processing, fusing, transferring, cleaning","Processing, exposing, charging, transferring, developing, cleaning, fusing"],a:1,e:"Processing → charging → exposing → developing → transferring → fusing → cleaning. A consistent drag-and-drop PBQ topic."},
+{d:"hw",q:"Which motherboard form factor is the smallest of these?",o:["ATX","Micro-ATX","Mini-ITX","E-ATX"],a:2,e:"Mini-ITX (17×17 cm) < Micro-ATX < ATX < E-ATX. Smaller boards have fewer expansion slots."},
+{d:"hw",q:"Which type of RAM detects and corrects single-bit memory errors, and is common in servers?",o:["DDR5 non-ECC","ECC RAM","SO-DIMM","VRAM"],a:1,e:"ECC (Error-Correcting Code) RAM fixes single-bit errors on the fly — standard in servers and workstations where data integrity matters."},
+{d:"hw",q:"Which power connector supplies the main power to a modern motherboard?",o:["4-pin Molex","24-pin ATX","8-pin EPS","6-pin PCIe"],a:1,e:"The 24-pin ATX connector is the main board feed. The 8-pin EPS powers the CPU; 6/8-pin PCIe connectors power graphics cards."},
+{d:"hw",q:"Which display connector carries both video and audio and is most common on TVs?",o:["VGA","DVI-D","HDMI","Serial"],a:2,e:"HDMI carries video + audio. VGA is analog video only; DVI-D is digital video only. DisplayPort also carries both and dominates on monitors."},
+{d:"hw",q:"A technician needs to print multi-part carbon forms in a warehouse. Which printer type is required?",o:["Laser","Inkjet","Thermal","Impact (dot matrix)"],a:3,e:"Only impact printers physically strike the page, so they're the only type that can print through multi-part carbon forms."},
+
+/* ---- Virtualization & Cloud (Core 1, 11%) ---- */
+{d:"cloud",q:"Which hypervisor type runs directly on hardware without a host operating system?",o:["Type 1 (bare metal)","Type 2 (hosted)","Container engine","Emulator"],a:0,e:"Type 1 (e.g., VMware ESXi, Hyper-V Server) runs on bare metal. Type 2 (VirtualBox, VMware Workstation) runs on top of a normal OS."},
+{d:"cloud",q:"In which cloud model does the provider manage everything and you simply use the application (e.g., Gmail)?",o:["IaaS","PaaS","SaaS","DaaS"],a:2,e:"SaaS = ready-to-use software. PaaS gives you a platform to deploy your code; IaaS gives raw infrastructure (VMs, storage) that you manage from the OS up."},
+{d:"cloud",q:"A developer wants to deploy code without managing servers or operating systems. Which cloud model fits best?",o:["IaaS","PaaS","SaaS","On-premises"],a:1,e:"PaaS (e.g., Heroku, Azure App Service) manages the OS and runtime — the developer just deploys the application."},
+{d:"cloud",q:"Which cloud characteristic lets resources automatically scale up during a traffic spike and back down afterward?",o:["Measured service","Rapid elasticity","Resource pooling","Broad network access"],a:1,e:"Rapid elasticity is on-demand scaling. Measured service is pay-per-use metering; resource pooling is sharing hardware across tenants."},
+{d:"cloud",q:"What is a key difference between containers and virtual machines?",o:["Containers include a full guest OS","Containers share the host OS kernel","VMs start faster than containers","VMs use less disk space"],a:1,e:"Containers share the host kernel, making them lightweight and fast to start. Each VM carries a full guest OS."},
+{d:"cloud",q:"Which cloud deployment model mixes on-premises private infrastructure with public cloud services?",o:["Public","Private","Hybrid","Community"],a:2,e:"Hybrid cloud combines private + public, letting sensitive workloads stay in-house while bursting to public cloud as needed."},
+{d:"cloud",q:"Before applying a risky update to a VM, what should the technician create to enable instant rollback?",o:["A container","A snapshot","A clone of the host","A RAID mirror"],a:1,e:"A VM snapshot captures the current state so you can revert instantly if the update breaks something."},
+{d:"cloud",q:"What is a common use of a sandbox virtual machine?",o:["Hosting production databases","Safely testing suspicious software","Increasing GPU performance","Extending Wi-Fi range"],a:1,e:"A sandbox VM isolates untrusted software from the host — if malware detonates, you revert the snapshot and the host is untouched."},
+{d:"cloud",q:"Which term describes cloud billing where you pay only for the resources you consume?",o:["Rapid elasticity","Measured service","High availability","Load balancing"],a:1,e:"Measured (metered) service is the pay-as-you-go model — usage is tracked and billed accordingly."},
+
+/* ---- HW & Network Troubleshooting (Core 1, 29%) ---- */
+{d:"hwts",q:"What is the FIRST step of the CompTIA troubleshooting methodology?",o:["Establish a theory of probable cause","Identify the problem","Test the theory","Document findings"],a:1,e:"1) Identify the problem, 2) establish a theory, 3) test the theory, 4) establish a plan, 5) implement, 6) verify full functionality, 7) document. Memorize the order."},
+{d:"hwts",q:"After implementing a solution, what should a technician do NEXT according to the methodology?",o:["Document findings","Verify full system functionality","Establish a new theory","Escalate the ticket"],a:1,e:"Verify full functionality (and implement preventive measures) comes after implementing the fix; documentation is the final step."},
+{d:"hwts",q:"A hard drive is making rhythmic clicking noises and files are disappearing. What should the technician do FIRST?",o:["Defragment the drive","Back up the data immediately","Run chkdsk overnight","Replace the SATA cable"],a:1,e:"Clicking = imminent mechanical failure. Back up data before anything else — diagnostics can wait, the data can't."},
+{d:"hwts",q:"A workstation reports a S.M.A.R.T. error at boot. What does this indicate?",o:["The RAM failed POST","The storage drive predicts imminent failure","The BIOS battery is dead","The GPU driver is corrupt"],a:1,e:"S.M.A.R.T. is the drive's self-monitoring system. An error means back up now and replace the drive."},
+{d:"hwts",q:"A PC powers on, fans spin, but nothing appears on screen and it emits a repeating beep pattern. What are the beeps?",o:["A Windows error","POST beep codes indicating a hardware fault","Normal startup sounds","The PSU failing"],a:1,e:"POST beep codes signal pre-boot hardware failures (commonly RAM or GPU). Count the pattern and check the board vendor's code table."},
+{d:"hwts",q:"A laptop shuts down under load and the fan area is extremely hot. After cleaning dust, what else is a likely fix?",o:["Replacing the CMOS battery","Reapplying thermal paste","Adding more RAM","Updating the browser"],a:1,e:"Dried-out thermal paste is a classic cause of overheating shutdowns. Clean the heatsink/fan and reapply paste."},
+{d:"hwts",q:"Laser-printed pages show a faint duplicate of the previous page's image. Which component is faulty?",o:["Toner cartridge","Fuser assembly","Pickup rollers","Print driver"],a:1,e:"'Ghosting' — a faint repeat image — points to the fuser (or drum) failing to fully release/clean. Fuser is the classic answer."},
+{d:"hwts",q:"A user can reach devices on the local network but not any websites. ipconfig shows a valid IP and gateway. What should be checked NEXT?",o:["The Ethernet cable","DNS settings — try pinging an IP like 8.8.8.8","The keyboard drivers","The printer spooler"],a:1,e:"Local works, internet doesn't: test connectivity to a raw IP. If pinging 8.8.8.8 works but names fail, it's DNS."},
+{d:"hwts",q:"Which command traces the route packets take to a destination on Windows?",o:["ping","tracert","netstat","nslookup"],a:1,e:"tracert shows each hop to the destination — useful for finding where the path breaks. (Linux/macOS: traceroute.)"},
+{d:"hwts",q:"A network link works but is much slower than expected, and the switch port shows late collisions. What is the likely cause?",o:["A DNS misconfiguration","A duplex mismatch","An APIPA address","A bad power supply"],a:1,e:"One end full-duplex, the other half-duplex = duplex mismatch → collisions and slow throughput. Set both to auto-negotiate."},
+{d:"hwts",q:"A PC randomly reboots and you notice bulging capacitors on the motherboard. What is the fix?",o:["Reinstall Windows","Replace the motherboard","Flash the BIOS","Add a surge protector"],a:1,e:"Bulging/leaking capacitors mean the board is failing — replacement is the reliable fix."},
+
+/* ---- Operating Systems (Core 2, 30%) ---- */
+{d:"os",q:"Which hardware component is required to upgrade a PC to Windows 11?",o:["TPM 2.0","A discrete GPU","ECC RAM","An optical drive"],a:0,e:"Windows 11 requires TPM 2.0, Secure Boot-capable UEFI, and a supported CPU. TPM questions are a favorite on the 220-1202."},
+{d:"os",q:"Which Windows edition feature encrypts an entire drive and can use the TPM chip?",o:["EFS","BitLocker","Windows Hello","Storage Spaces"],a:1,e:"BitLocker is full-disk encryption (Pro and up), often keyed via TPM. EFS encrypts individual files/folders, not the whole disk."},
+{d:"os",q:"Which command scans and repairs corrupted Windows system files?",o:["chkdsk /f","sfc /scannow","diskpart","ipconfig /flushdns"],a:1,e:"sfc /scannow (System File Checker) verifies and repairs protected system files. chkdsk checks the disk/file system instead."},
+{d:"os",q:"Which command checks a disk for file system errors and bad sectors?",o:["sfc /scannow","chkdsk","gpupdate","netstat"],a:1,e:"chkdsk scans the volume; /f fixes errors, /r locates bad sectors. sfc repairs system files, not the disk."},
+{d:"os",q:"Which Linux command changes file permissions?",o:["chown","chmod","grep","ps"],a:1,e:"chmod changes permissions (e.g., chmod 755 file). chown changes ownership. Linux basics are new on the 220-1202."},
+{d:"os",q:"Which Linux command searches for text patterns inside files?",o:["find","ls","grep","kill"],a:2,e:"grep searches file contents for a pattern (grep 'error' log.txt). find locates files by name/attributes; ls just lists."},
+{d:"os",q:"On Ubuntu, which command installs software from the package repositories?",o:["sudo apt install","chmod install","tar install","grep install"],a:0,e:"apt is Debian/Ubuntu's package manager; sudo elevates the command. (Red Hat family uses yum/dnf.)"},
+{d:"os",q:"Which partition scheme is required to boot from drives larger than 2 TB with UEFI?",o:["MBR","GPT","FAT32","exFAT"],a:1,e:"GPT supports huge drives and 128+ partitions and pairs with UEFI. MBR is legacy — 2 TB max, 4 primary partitions."},
+{d:"os",q:"Which built-in macOS utility handles automatic backups?",o:["Keychain","Spotlight","Time Machine","FileVault"],a:2,e:"Time Machine does versioned backups. FileVault is disk encryption, Keychain stores passwords, Spotlight is search."},
+{d:"os",q:"A technician needs to see why a service failed to start. Which Windows tool shows system and application logs?",o:["Task Manager","Event Viewer","Device Manager","msconfig"],a:1,e:"Event Viewer holds System/Application/Security logs — the first stop for diagnosing service failures and crashes."},
+{d:"os",q:"Which Windows tool would you use to disable a faulty device's driver?",o:["Task Scheduler","Device Manager","Event Viewer","Registry Editor"],a:1,e:"Device Manager manages hardware: update, roll back, or disable drivers there."},
+
+/* ---- Security (Core 2, 27%) ---- */
+{d:"sec",q:"Which malware type encrypts a victim's files and demands payment for the decryption key?",o:["Worm","Trojan","Ransomware","Spyware"],a:2,e:"Ransomware encrypts data and extorts payment. Best defense: tested offline backups."},
+{d:"sec",q:"Which malware hides deep in the OS, often concealing itself from antivirus and Task Manager?",o:["Adware","Rootkit","Keylogger","Worm"],a:1,e:"Rootkits gain privileged access and hide their presence — often requiring boot-time scans or a full rebuild to remove."},
+{d:"sec",q:"An attacker calls pretending to be the help desk and asks a user for their password. What is this attack?",o:["Phishing","Vishing","Smishing","Tailgating"],a:1,e:"Vishing = voice phishing (phone). Phishing = email, smishing = SMS. Know all three definitions cold."},
+{d:"sec",q:"An unauthorized person slips through a secure door right behind an employee who badged in. What is this called?",o:["Shoulder surfing","Tailgating","Dumpster diving","Evil twin"],a:1,e:"Tailgating (piggybacking) is following an authorized person through access control. Mantraps/access control vestibules prevent it."},
+{d:"sec",q:"Which principle states users should only have the access needed to do their job — and nothing more?",o:["Zero-day","Least privilege","Single sign-on","Non-repudiation"],a:1,e:"Least privilege limits blast radius when an account is compromised. It's the core of access control design."},
+{d:"sec",q:"A user logs in with a password plus a code from an authenticator app. What is this an example of?",o:["Single sign-on","Multifactor authentication","Least privilege","Biometrics"],a:1,e:"MFA combines factors: something you know (password) + something you have (app/token) or are (biometric)."},
+{d:"sec",q:"An attacker sets up a rogue Wi-Fi access point with the same SSID as a coffee shop's network to intercept traffic. What is this attack?",o:["Evil twin","War driving","Bluejacking","DDoS"],a:0,e:"An evil twin impersonates a legitimate AP so victims connect through the attacker. VPNs and HTTPS mitigate the damage."},
+{d:"sec",q:"In CompTIA's malware removal procedure, what must be disabled in Windows before remediating?",o:["Windows Firewall","System Restore","Secure Boot","UAC"],a:1,e:"Disable System Restore so infected restore points can't reinfect the machine. Full order: identify → quarantine → disable System Restore → remediate (safe mode) → schedule scans → re-enable System Restore → educate the user."},
+{d:"sec",q:"What is the FINAL step of CompTIA's malware removal process?",o:["Quarantine the system","Schedule antivirus scans","Educate the end user","Update anti-malware signatures"],a:2,e:"Educating the user comes last — prevention is the endgame. Removal steps are directly tested, often as drag-and-drop PBQs."},
+{d:"sec",q:"Which Windows feature prompts for confirmation when a program tries to make system-level changes?",o:["SmartScreen","BitLocker","User Account Control (UAC)","Windows Hello"],a:2,e:"UAC intercepts privilege elevation with a consent prompt, limiting silent system changes by malware."},
+{d:"sec",q:"Why is MAC address filtering considered a weak security control on its own?",o:["It slows the network down","MAC addresses are easily spoofed","It blocks WPA3","It only works on 5 GHz"],a:1,e:"Attackers can trivially clone an allowed MAC address. Filtering adds minor friction, not real security — pair with WPA2/WPA3."},
+
+/* ---- Software Troubleshooting (Core 2, 26%) ---- */
+{d:"swts",q:"Windows fails to boot with a 'BOOTMGR is missing' style error. Which command rebuilds the boot configuration data?",o:["sfc /scannow","bootrec /rebuildbcd","chkdsk /r","diskpart clean"],a:1,e:"From the Recovery Environment: bootrec /fixmbr, /fixboot, and /rebuildbcd repair boot records. /rebuildbcd rebuilds the BCD store."},
+{d:"swts",q:"Which environment do you boot into to run Startup Repair or System Restore when Windows won't start?",o:["BIOS setup","Windows Recovery Environment (WinRE)","Safe Mode with Networking","Task Manager"],a:1,e:"WinRE hosts Startup Repair, System Restore, image recovery, and a command prompt. It launches automatically after failed boots or via installation media."},
+{d:"swts",q:"A PC is suspected of malware infection. Which startup mode loads Windows with only essential drivers for remediation?",o:["Clean boot","Safe Mode","Fast startup","Recovery console"],a:1,e:"Safe Mode loads a minimal driver set, preventing most malware from activating so tools can remove it."},
+{d:"swts",q:"A user's browser homepage changed itself and searches redirect to unknown sites. What is the most likely cause?",o:["A failing hard drive","Malware/browser hijacker","A DNS server outage","An outdated GPU driver"],a:1,e:"Redirects, new toolbars, and changed homepages are classic browser hijacker/malware symptoms. Begin the malware removal process."},
+{d:"swts",q:"An Android app keeps crashing. The user doesn't want to lose their saved login. What should be tried FIRST?",o:["Clear the app's data","Clear the app's cache","Factory reset the phone","Reflash the OS"],a:1,e:"Clearing cache removes temporary files without touching logins or settings. Clearing data wipes everything; try cache first."},
+{d:"swts",q:"A user logs in and gets a temporary desktop with none of their files or settings. What is the likely cause?",o:["The drive is full","A corrupt user profile","BitLocker locked the drive","Windows Update failed"],a:1,e:"Logging into a temporary profile indicates user-profile corruption. Fix via registry ProfileList repair or by recreating the profile and migrating data."},
+{d:"swts",q:"An older application won't run on Windows 11. What is the quickest thing to try?",o:["Reinstall Windows 10","Run it in compatibility mode","Disable the firewall","Convert the disk to GPT"],a:1,e:"Right-click → Properties → Compatibility lets the app run as if on an older Windows version — the standard first move for legacy software."},
+{d:"swts",q:"Task Manager shows 100% disk usage and the PC with a mechanical HDD is extremely slow at idle. Which is a reasonable long-term fix?",o:["Add a second monitor","Upgrade to an SSD","Disable Windows Defender","Lower the screen resolution"],a:1,e:"Sustained 100% disk on an HDD is common; after ruling out malware and runaway processes, an SSD upgrade is the transformative fix."},
+{d:"swts",q:"A system crashes with a Blue Screen after a driver update. What is the FIRST thing to try?",o:["Replace the RAM","Roll back the driver","Reinstall Windows","Flash the BIOS"],a:1,e:"BSOD right after a driver update points at that driver — roll it back in Device Manager (or via Safe Mode if Windows won't boot)."},
+{d:"swts",q:"Which symptom most strongly suggests active malware rather than a hardware problem?",o:["POST beep codes","Security software and Task Manager are disabled","A clicking hard drive","Dead pixels"],a:1,e:"Malware commonly disables defenses (AV, Task Manager, Registry Editor) to protect itself. The other options are hardware symptoms."},
+
+/* ---- Operational Procedures (Core 2, 17%) ---- */
+{d:"ops",q:"What does the 3-2-1 backup rule specify?",o:["3 backups, 2 clouds, 1 password","3 copies of data, 2 different media types, 1 offsite","3 drives, 2 partitions, 1 OS","3 daily, 2 weekly, 1 monthly backup"],a:1,e:"Keep 3 copies of your data, on 2 different media types, with 1 copy offsite. Tested directly on the exam."},
+{d:"ops",q:"Which backup type copies only files changed since the LAST backup of any kind?",o:["Full","Differential","Incremental","Synthetic"],a:2,e:"Incremental = changes since the last backup of any type (fast backup, slower restore). Differential = all changes since the last FULL backup (grows daily, faster restore)."},
+{d:"ops",q:"Which backup type backs up everything changed since the last FULL backup?",o:["Incremental","Differential","Snapshot","Mirror"],a:1,e:"Differential grows each day until the next full backup. Restore needs just the full + latest differential — fewer sets than incremental."},
+{d:"ops",q:"What is the primary tool for preventing electrostatic discharge while working inside a PC?",o:["Rubber gloves","Antistatic wrist strap","A wooden desk","A surge protector"],a:1,e:"An antistatic wrist strap grounds you to the chassis so static discharges harmlessly. ESD can destroy components with less charge than you can feel."},
+{d:"ops",q:"Before applying a major change to production systems, what must a change request include in case things go wrong?",o:["A purchase order","A rollback plan","A new SSID","An NDA"],a:1,e:"Change management requires a rollback (backout) plan, impact analysis, approval, and a maintenance window."},
+{d:"ops",q:"Which file extension indicates a PowerShell script?",o:[".bat",".sh",".py",".ps1"],a:3,e:".ps1 = PowerShell, .bat = batch, .sh = Linux shell, .py = Python. Know the extensions and typical use cases — not deep coding."},
+{d:"ops",q:"Where would a technician find safe-handling and disposal information for a chemical solvent?",o:["The EULA","The SDS (Safety Data Sheet)","The AUP","The SLA"],a:1,e:"The Safety Data Sheet (SDS/MSDS) documents hazards, handling, and disposal for materials like solvents and batteries."},
+{d:"ops",q:"A customer is angry and venting about a recurring problem. What is the BEST response?",o:["Interrupt to explain the fix quickly","Listen fully without interrupting, then restate the issue","Escalate immediately to a manager","Tell them it's user error"],a:1,e:"Professionalism: actively listen, don't interrupt, restate to confirm understanding, and set realistic expectations."},
+{d:"ops",q:"Which of these is considered PII that must be handled under privacy regulations?",o:["A device's MAC address list","A customer's date of birth and SSN","The office Wi-Fi SSID","A printer's page count"],a:1,e:"Personally Identifiable Information (DOB, SSN, address, etc.) is regulated — follow retention and disclosure policies, and report mishandling."},
+{d:"ops",q:"Which document defines what users are allowed to do on company systems and networks?",o:["SLA","AUP","SOP","MOU"],a:1,e:"The Acceptable Use Policy (AUP) sets rules for using company IT. SLA = service levels; SOP = how to perform a procedure."},
+];
+
+/* ================= STATE ================= */
+const KEY="aplus_v1";
+let S = load();
+function load(){
+  try{ const raw=localStorage.getItem(KEY); if(raw) return JSON.parse(raw);}catch(e){}
+  return {focus:DOMAINS.map(d=>d.id), qstats:{}, sessions:0};
+}
+S.aiQ = S.aiQ||[];  S.apiKey = S.apiKey||"";  S.model = S.model||"claude-haiku-4-5-20251001";
+S.provider = S.provider||"gemini"; S.gemKey = S.gemKey||""; S.gemModel = S.gemModel||"gemini-3-flash";
+S.theme=S.theme||"dark"; S.quizLen=S.quizLen||10; if(S.shuffleOpts===undefined)S.shuffleOpts=true;
+S.feedback=S.feedback||"each"; S.examDate=S.examDate||""; S.dailyGoal=S.dailyGoal||20;
+S.daily=S.daily||{date:"",count:0}; S.streak=S.streak||{count:0,last:""}; S.sbCollapsed=!!S.sbCollapsed;
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+QUESTIONS.push(...S.aiQ);   // restore AI-generated questions from previous sessions
+function save(){ try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} }
+function qs(i){ return S.qstats[i] || (S.qstats[i]={seen:0,right:0,wrong:0,lastWrong:false}); }
+
+function domainStats(id){
+  let seen=0,right=0;
+  QUESTIONS.forEach((q,i)=>{ if(q.d===id && S.qstats[i]){ seen+=S.qstats[i].seen; right+=S.qstats[i].right; }});
+  return {seen, right, acc: seen? right/seen : null};
+}
+function gapScores(){
+  return DOMAINS.map(d=>{
+    const st=domainStats(d.id);
+    const acc = st.acc===null ? 0.35 : st.acc; // untested domains treated as weak-ish
+    return {...d, ...st, priority: d.weight*(1-acc)};
+  }).sort((a,b)=>b.priority-a.priority);
+}
+
+/* ================= NAV / RENDER ================= */
+const TABS=[["dash","Dashboard"],["quiz","Practice"],["labs","Labs"],["ai","AI Tutor"],["focus","Focus"],["grow","Grow"],["set","Settings"]];
+let tab="dash", quiz=null, lab=null, sbOpen=false;
+const SVGI=(cls,inner)=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+const NAV_ICONS={
+  dash:SVGI("ic-dash",'<path d="M3 21h18"/><rect x="5" y="12" width="3.5" height="6" rx="1"/><rect x="10.2" y="8" width="3.5" height="10" rx="1"/><rect x="15.5" y="4" width="3.5" height="14" rx="1"/>'),
+  quiz:SVGI("ic-quiz",'<path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>'),
+  labs:SVGI("ic-labs",'<path d="M10 2v6L4.5 18a3 3 0 0 0 2.6 4.5h9.8a3 3 0 0 0 2.6-4.5L14 8V2"/><path d="M8.5 2h7"/><circle class="bub" cx="12" cy="16" r="1.1"/>'),
+  ai:SVGI("ic-ai",'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z"/><path class="spk" d="M19 3l.8 2.2L22 6l-2.2.8L19 9l-.8-2.2L16 6l2.2-.8Z"/>'),
+  focus:SVGI("ic-focus",'<circle class="ring" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>'),
+  grow:SVGI("ic-grow",'<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>'),
+  set:SVGI("ic-set",'<circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>'),
+};
+
+function nav(){
+  document.getElementById("nav").innerHTML = TABS.map(([id,label])=>
+    `<button class="${tab===id?'active':''}" title="${label}" onclick="sbOpen=false;go('${id}')"><span class="ico">${NAV_ICONS[id]||"•"}</span><span class="lbl">${label}</span></button>`).join("");
+  const c=document.getElementById("sb-col"); if(c) c.textContent=S.sbCollapsed?"⟩":"⟨";
+}
+function toggleSb(){ S.sbCollapsed=!S.sbCollapsed; save(); render(); }
+function go(t){ tab=t; quiz=null; lab=null; stop3D(); render(); }
+function render(){ nav();
+  if(typeof document!=="undefined"&&document.body)
+    document.body.className = (S.theme==="light"?"light ":"")+(S.sbCollapsed?"sb-min ":"")+(sbOpen?"sb-open":"");
+  const el=document.getElementById("app");
+  if(tab==="set") { el.innerHTML=settingsView(); afterRender(); window.scrollTo(0,0); return; }
+  if(tab==="dash") el.innerHTML=dashView();
+  else if(tab==="quiz") el.innerHTML= quiz? quizView() : quizSetupView();
+  else if(tab==="labs") el.innerHTML= lab? labView() : labsHubView();
+  else if(tab==="ai") el.innerHTML=aiView();
+  else if(tab==="focus") el.innerHTML=focusView();
+  else if(tab==="grow") el.innerHTML=growView();
+  afterRender();
+  window.scrollTo(0,0);
+}
+function afterRender(){
+  if(tab==="labs" && lab==="cable") init3D();
+  if(tab==="labs" && lab==="term"){ const i=document.getElementById("term-in"); if(i) i.focus(); }
+  if(tab==="ai"){ const b=document.getElementById("chat-scroll"); if(b) b.scrollTop=b.scrollHeight; }
+}
+
+/* ================= DASHBOARD ================= */
+function accColor(a){ return a===null?"var(--muted)": a>=0.85?"var(--good)": a>=0.65?"var(--warn)":"var(--bad)"; }
+function dashView(){
+  const gaps=gapScores();
+  const totalSeen=Object.values(S.qstats).reduce((s,q)=>s+q.seen,0);
+  const totalRight=Object.values(S.qstats).reduce((s,q)=>s+q.right,0);
+  const overall= totalSeen? Math.round(100*totalRight/totalSeen):null;
+  const missed=QUESTIONS.filter((q,i)=>S.qstats[i]&&S.qstats[i].lastWrong).length;
+  const bars=c=>DOMAINS.filter(d=>d.core===c).map(d=>{
+    const st=domainStats(d.id); const pct= st.acc===null?0:Math.round(st.acc*100);
+    return `<div class="bar-row"><div class="bar-label"><span>${d.name} <span class="pct">· ${d.weight}% of exam</span></span>
+      <span class="pct">${st.acc===null?"not tested":pct+"% ("+st.right+"/"+st.seen+")"}</span></div>
+      <div class="bar"><div style="width:${st.acc===null?3:pct}%;background:${accColor(st.acc)}"></div></div></div>`;}).join("");
+  return `
+  <div class="card center">
+    <div class="muted">Overall accuracy</div>
+    <div class="result-big" style="color:${overall===null?'var(--muted)':overall>=85?'var(--good)':overall>=65?'var(--warn)':'var(--bad)'}">${overall===null?"—":overall+"%"}</div>
+    <div class="muted">${totalSeen} questions answered · ${missed} currently missed</div>
+    <div class="row" style="justify-content:center;margin-top:10px">
+      ${S.examDate?`<span class="pill">${ic("cal")} ${Math.max(0,Math.ceil((new Date(S.examDate)-new Date(todayStr()))/864e5))} days to exam</span>`:""}
+      <span class="pill">${ic("target")} Today ${S.daily.date===todayStr()?S.daily.count:0}/${S.dailyGoal}</span>
+      ${S.streak.count?`<span class="pill">${ic("flame")} ${S.streak.count}-day streak</span>`:""}
+    </div>
+    <div class="row" style="justify-content:center;margin-top:14px">
+      <button class="btn" onclick="startQuiz('quick')">Quick quiz (10)</button>
+      <button class="btn secondary" ${missed?"":"disabled"} onclick="startQuiz('missed')">Review missed (${missed})</button>
+    </div>
+  </div>
+  <div class="card"><h2>Knowledge gaps <span class="muted" style="font-weight:400">— highest priority first (exam weight × weakness)</span></h2>
+    ${gaps.slice(0,3).map(g=>`<div class="gap-item"><span>${g.name}<span class="tag ${g.core===1?'c1':'c2'}">Core ${g.core}</span></span>
+      <span class="score" style="color:${accColor(g.acc)}">${g.acc===null?"untested":Math.round(g.acc*100)+"%"}</span></div>`).join("")}
+    <button class="btn small secondary" style="margin-top:6px" onclick="startGapQuiz()">Drill my top gaps</button>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Core 1 · 220-1201</h3>${bars(1)}</div>
+    <div class="card"><h3>Core 2 · 220-1202</h3>${bars(2)}</div>
+  </div>`;
+}
+
+/* ================= QUIZ ================= */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function pool(ids){ return QUESTIONS.map((q,i)=>({...q,i})).filter(q=>ids.includes(q.d)); }
+
+function startQuiz(mode){
+  let items=[];
+  if(mode==="quick"){ items=shuffle(pool(S.focus.length?S.focus:DOMAINS.map(d=>d.id))).slice(0,S.quizLen); }
+  else if(mode==="missed"){ items=shuffle(QUESTIONS.map((q,i)=>({...q,i})).filter(q=>S.qstats[q.i]&&S.qstats[q.i].lastWrong)); }
+  else if(mode==="core1"||mode==="core2"){
+    const core=mode==="core2"?2:1, n=20;
+    const doms=DOMAINS.filter(d=>d.core===core);
+    const tw=doms.reduce((s,d)=>s+d.weight,0);
+    doms.forEach(d=>{ const take=Math.max(1,Math.round(n*d.weight/tw));
+      items.push(...shuffle(pool([d.id])).slice(0,take)); });
+    items=shuffle(items);
+  }
+  if(!items.length){ alert("No questions available for that mode yet."); return; }
+  quiz={items:prep(items), idx:0, right:0, answered:null, results:[]};
+  tab="quiz"; render();
+}
+function prep(items){ return items.map(it=>({...it, perm:S.shuffleOpts?shuffle([0,1,2,3]):[0,1,2,3]})); }
+function startGapQuiz(){
+  const top=gapScores().slice(0,3).map(g=>g.id);
+  const items=shuffle(pool(top)).slice(0,12);
+  quiz={items:prep(items), idx:0, right:0, answered:null, results:[]};
+  tab="quiz"; render();
+}
+function answer(k){
+  if(quiz.answered!==null) return;
+  const q=quiz.items[quiz.idx], st=qs(q.i), ok=(k===q.a);
+  quiz.answered=k; st.seen++; ok?(st.right++,quiz.right++):st.wrong++;
+  st.lastWrong=!ok; quiz.results.push({q,ok});
+  const t=todayStr();
+  if(S.daily.date!==t) S.daily={date:t,count:0};
+  S.daily.count++;
+  if(S.daily.count===S.dailyGoal){
+    const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+    S.streak.count = S.streak.last===y ? S.streak.count+1 : 1;
+    S.streak.last=t;
+  }
+  save(); render();
+}
+function nextQ(){
+  quiz.qchat=null;
+  if(quiz.idx+1>=quiz.items.length){ quiz.done=true; S.sessions++; save(); }
+  else { quiz.idx++; quiz.answered=null; }
+  render();
+}
+function quizSetupView(){
+  const missed=QUESTIONS.filter((q,i)=>S.qstats[i]&&S.qstats[i].lastWrong).length;
+  const focusNames=S.focus.length===DOMAINS.length?"All domains":DOMAINS.filter(d=>S.focus.includes(d.id)).map(d=>d.name).join(", ");
+  return `
+  <div class="card"><h2>Practice modes</h2>
+    <div class="muted" style="margin-bottom:14px">Current focus: <b style="color:var(--text)">${focusNames||"none — select in Focus Areas"}</b></div>
+    <div class="row">
+      <button class="btn" onclick="startQuiz('quick')">Quick quiz · 10 from focus areas</button>
+      <button class="btn secondary" onclick="startGapQuiz()">Gap drill · 12 from weakest domains</button>
+    </div>
+  </div>
+  <div class="card"><h2>Exam simulation <span class="muted" style="font-weight:400">— questions weighted like the real exam</span></h2>
+    <div class="row">
+      <button class="btn secondary" onclick="startQuiz('core1')">Core 1 sim · 20 Q</button>
+      <button class="btn secondary" onclick="startQuiz('core2')">Core 2 sim · 20 Q</button>
+    </div>
+  </div>
+  <div class="card"><h2>Review</h2>
+    <button class="btn secondary" ${missed?"":"disabled"} onclick="startQuiz('missed')">Retry all missed questions (${missed})</button>
+    <div class="muted" style="margin-top:8px">Questions leave this list once you answer them correctly.</div>
+  </div>
+  <div class="card"><h2>${ic("zap")}AI question generator <span class="muted" style="font-weight:400">— fresh questions, never the same twice</span></h2>
+    ${aiReady()?`
+    <div class="row" style="align-items:center">
+      <select id="gen-dom" style="background:rgba(10,15,26,.5);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-size:.88rem">
+        ${gapScores().map((g,i)=>`<option value="${g.id}" ${i===0?"selected":""}>${g.name}${i===0?" (weakest)":""}</option>`).join("")}
+      </select>
+      <button id="gen-btn" class="btn" onclick="runGen()">${ic("zap")} Generate 5 AI questions</button>
+    </div>
+    <div id="gen-msg" class="muted" style="margin-top:8px">Generated questions are saved and count toward your domain stats. (${S.aiQ.length} generated so far)</div>`
+    :`<div class="muted">Connect a free Gemini API key to generate unlimited fresh questions targeted at your weak spots.</div>
+    <button class="btn secondary small" style="margin-top:10px" onclick="openSettings()">${ic("gear")} Set up AI</button>`}
+  </div>`;
+}
+function quizView(){
+  if(quiz.done){
+    const pct=Math.round(100*quiz.right/quiz.items.length);
+    const byDom={};
+    quiz.results.forEach(r=>{ byDom[r.q.d]=byDom[r.q.d]||{r:0,t:0}; byDom[r.q.d].t++; if(r.ok)byDom[r.q.d].r++; });
+    return `<div class="card center">
+      <h2>Session complete</h2>
+      <div class="result-big" style="color:${pct>=85?'var(--good)':pct>=65?'var(--warn)':'var(--bad)'}">${pct}%</div>
+      <div class="muted">${quiz.right} / ${quiz.items.length} correct</div></div>
+    <div class="card"><h3>By domain this session</h3>
+      ${Object.entries(byDom).map(([d,v])=>{const dom=DOMAINS.find(x=>x.id===d);
+        return `<div class="stat-line"><span>${dom.name}</span><span style="color:${accColor(v.r/v.t)}">${v.r}/${v.t}</span></div>`;}).join("")}
+    </div>
+    ${S.feedback==="end"&&quiz.results.some(r=>!r.ok)?`<div class="card"><h3>Missed questions</h3>
+      ${quiz.results.filter(r=>!r.ok).map(r=>`<div class="explain" style="margin-bottom:10px"><b>${esc(r.q.q)}</b><br>
+      Correct: ${String.fromCharCode(65+r.q.a)}. ${esc(r.q.o[r.q.a])}<br>${esc(r.q.e)}</div>`).join("")}</div>`:""}
+    <div class="row"><button class="btn" onclick="go('quiz')">Practice again</button>
+    <button class="btn secondary" onclick="go('dash')">Dashboard</button></div>`;
+  }
+  const q=quiz.items[quiz.idx], dom=DOMAINS.find(d=>d.id===q.d), a=quiz.answered;
+  return `<div class="card">
+    <div class="qnum">Question ${quiz.idx+1} of ${quiz.items.length} · ${dom.name}<span class="tag ${dom.core===1?'c1':'c2'}">Core ${dom.core}</span></div>
+    <div class="question">${q.q}</div>
+    ${(q.perm||[0,1,2,3]).map((oi,pos)=>{
+      let cls="opt";
+      if(a!==null){
+        if(S.feedback==="end"){ if(oi===a)cls+=" sel"; }
+        else { if(oi===q.a)cls+=" correct"; else if(oi===a)cls+=" wrong"; }
+      }
+      return `<button class="${cls}" ${a!==null?"disabled":""} onclick="answer(${oi})">${String.fromCharCode(65+pos)}. ${q.o[oi]}</button>`;
+    }).join("")}
+    ${a!==null?( S.feedback==="end"
+      ? `<div class="muted" style="margin:6px 0 12px">Answer recorded — results at the end, like the real exam.</div>
+         <button class="btn" onclick="nextQ()">${quiz.idx+1>=quiz.items.length?"Finish":"Next question"}</button>`
+      : `<div class="explain">${a===q.a?OKI+" Correct. ":BADI+" Not quite. "}${q.e}</div>
+      <div class="row">
+        <button class="btn" onclick="nextQ()">${quiz.idx+1>=quiz.items.length?"Finish":"Next question"}</button>
+        <button class="btn secondary" onclick="askAboutQ()">${ic("sparkles")} Ask AI about this</button>
+      </div>
+      <div id="qchat"></div>`):""}
+  </div>`;
+}
+
+/* ================= FOCUS ================= */
+function toggleFocus(id){
+  S.focus = S.focus.includes(id)? S.focus.filter(x=>x!==id) : [...S.focus,id];
+  save(); render();
+}
+function focusView(){
+  const item=d=>{
+    const on=S.focus.includes(d.id), st=domainStats(d.id);
+    return `<div class="focus-item ${on?'on':''}" onclick="toggleFocus('${d.id}')">
+      <div class="check">${on?ic("check"):""}</div>
+      <div style="flex:1"><div>${d.name}</div>
+      <div class="meta">${d.weight}% of exam · ${st.acc===null?"not tested yet":Math.round(st.acc*100)+"% accuracy"}</div></div>
+      <span class="tag ${d.core===1?'c1':'c2'}">Core ${d.core}</span></div>`;
+  };
+  return `<div class="card"><h2>Focus areas</h2>
+    <div class="muted" style="margin-bottom:14px">Quick quizzes pull only from selected domains. Exam sims and gap drills ignore this and use exam weighting.</div>
+    <h3>Core 1 · 220-1201</h3>${DOMAINS.filter(d=>d.core===1).map(item).join("")}
+    <h3 style="margin-top:16px">Core 2 · 220-1202</h3>${DOMAINS.filter(d=>d.core===2).map(item).join("")}
+    <div class="row" style="margin-top:12px">
+      <button class="btn small secondary" onclick="S.focus=DOMAINS.map(d=>d.id);save();render()">Select all</button>
+      <button class="btn small secondary" onclick="S.focus=[];save();render()">Clear</button>
+    </div></div>`;
+}
+
+/* ================= GROW ================= */
+function growView(){
+  return `
+  <div class="card"><h2>Exam facts (current as of July 2026)</h2>
+    <ul class="plain">
+      <li><b>Two exams required:</b> Core 1 (220-1201, pass 675/900) and Core 2 (220-1202, pass 700/900). Up to 90 questions, 90 minutes each.</li>
+      <li><b>PBQs:</b> both exams open with performance-based questions — practice port tables, the 7-step troubleshooting methodology, the laser printing process, and the malware removal order as ordered lists, not just facts.</li>
+      <li><b>New in this version:</b> AI basics, Zero Trust, eSIM, Windows 11 requirements (TPM 2.0), Linux command line, updated malware types.</li>
+    </ul>
+  </div>
+  <div class="card"><h2>After the A+ — high-demand paths</h2>
+    <ul class="plain">
+      <li><b>Security+ (SY0-701):</b> the highest-demand next step. Security roles consistently outnumber qualified candidates, and many government/DoD jobs require it (8570/8140 baseline).</li>
+      <li><b>Network+ (N10-009):</b> the classic A+ follow-up. Deepens the networking domain you're already studying — strong pairing for help desk → network tech moves.</li>
+      <li><b>Cloud:</b> AWS Certified Cloud Practitioner or Azure Fundamentals (AZ-900) are entry cloud certs; cloud support and cloud admin roles are growing faster than traditional desktop support.</li>
+      <li><b>Scripting/automation:</b> PowerShell and Python skills separate junior techs from the pack — the A+ only asks you to recognize scripts, but writing them is what employers pay extra for.</li>
+      <li><b>Endpoint/MDM administration:</b> Intune, Jamf, and other MDM platforms are in demand as hybrid work persists — a natural extension of the Mobile Devices domain.</li>
+    </ul>
+    <div class="muted" style="margin-top:10px">Your weekly research briefing keeps this section's advice current — check those briefings for market shifts and exam-version news.</div>
+  </div>`;
+}
+
+/* ================= HELPERS ================= */
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+const UIC={
+  plug:'<path d="M9 7V3M15 7V3"/><path d="M6 7h12v4a6 6 0 0 1-12 0Z"/><path d="M12 17v4"/>',
+  layers:'<path d="M12 2l9 5-9 5-9-5Z"/><path d="M3 12l9 5 9-5"/><path d="M3 17l9 5 9-5"/>',
+  term:'<path d="M4 17l6-5-6-5"/><path d="M12 19h8"/>',
+  pc:'<rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="7" r="1"/><path d="M10 17h4"/>',
+  sparkles:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z"/><path d="M19 3l.8 2.2L22 6l-2.2.8L19 9l-.8-2.2L16 6l2.2-.8Z"/>',
+  sliders:'<path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h7M17 18h3"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="18" r="2"/>',
+  pencil:'<path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/>',
+  db:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+  zap:'<path d="M13 2L4 14h6l-1 8 9-12h-6Z"/>',
+  down:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',
+  up:'<path d="M12 21V9M7 14l5-5 5 5M4 3h16"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  flame:'<path d="M12 22c4.4 0 8-3.2 8-7.5 0-3-2-5.2-3.5-6.8C15 6.2 14 4.3 14 2c-3.2 2-5.5 4.6-5.5 7 0 1-.6 1.8-1.5 1.3C6.2 9.9 6 8.8 6 7.8 4.7 9.6 4 11.8 4 14.5 4 18.8 7.6 22 12 22Z"/>',
+  cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  gear:'<circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
+  chip:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>',
+  ram:'<rect x="2" y="7" width="20" height="10" rx="1.5"/><path d="M6 11v3M10 11v3M14 11v3M18 11v3"/>',
+  gpu:'<rect x="2" y="7" width="18" height="9" rx="2"/><circle cx="8" cy="11.5" r="2.5"/><circle cx="14.5" cy="11.5" r="2.5"/><path d="M4 16v4"/>',
+  drive:'<rect x="3" y="8" width="18" height="8" rx="2"/><path d="M17.3 11.8v.4"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/>',
+  check:'<path d="M20 6L9 17l-5-5"/>',
+  x:'<path d="M18 6L6 18M6 6l12 12"/>',
+  bulb:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.4 1 2.3h6c0-.9.4-1.8 1-2.3A7 7 0 0 0 12 2Z"/>',
+  trophy:'<path d="M8 21h8M12 17v4"/><path d="M7 4h10v4a5 5 0 0 1-10 0Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3"/>',
+};
+function ic(n){return `<svg class="ui-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${UIC[n]||""}</svg>`;}
+const OKI=`<span style="color:var(--good)">${ic("check")}</span>`;
+const BADI=`<span style="color:var(--bad)">${ic("x")}</span>`;
+const BULB=`<span style="color:var(--warn)">${ic("bulb")}</span>`;
+
+/* ================= AI (Gemini free tier / Anthropic) ================= */
+function aiReady(){ return S.provider==="gemini" ? !!S.gemKey : !!S.apiKey; }
+const FETCH_HELP = "The browser blocked the request ('failed to fetch'). Fixes, in order: 1) launch the app with start-app.bat instead of double-clicking the HTML file; 2) turn off ad-blockers/privacy extensions for this page; 3) check your internet/VPN/firewall.";
+async function callClaude(messages, system, maxTokens){
+  if(!aiReady()){ openSettings(); throw new Error("Add your API key first (Settings → AI setup)."); }
+  if(S.provider==="gemini") return callGemini(messages, system, maxTokens);
+  let r;
+  try{
+    r = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{ "content-type":"application/json", "x-api-key":S.apiKey,
+        "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
+      body:JSON.stringify({ model:S.model, max_tokens:maxTokens||800, system, messages })
+    });
+  }catch(err){ throw new Error(FETCH_HELP); }
+  const j = await r.json();
+  if(j.error) throw new Error(j.error.message||"API error");
+  return j.content.map(b=>b.text||"").join("");
+}
+async function callGemini(messages, system, maxTokens){
+  const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(S.gemModel)+":generateContent?key="+encodeURIComponent(S.gemKey);
+  let r;
+  try{
+    r = await fetch(url,{ method:"POST", headers:{"content-type":"application/json"},
+      body:JSON.stringify({
+        contents:messages.map(m=>({role:m.role==="assistant"?"model":"user",parts:[{text:m.content}]})),
+        systemInstruction:{parts:[{text:system||""}]},
+        generationConfig:{maxOutputTokens:maxTokens||800}
+      })});
+  }catch(err){ throw new Error(FETCH_HELP); }
+  const j = await r.json();
+  if(j.error) throw new Error((j.error.message||"Gemini API error")+(String(j.error.message||"").includes("quota")?" — free-tier limit hit; wait a minute and retry.":""));
+  const cand=j.candidates&&j.candidates[0];
+  if(!cand||!cand.content||!cand.content.parts) throw new Error("Gemini returned no text (possibly rate-limited or blocked) — wait a moment and retry.");
+  return cand.content.parts.map(p=>p.text||"").join("");
+}
+let GEMLIST=null;
+async function gemFetchModels(){
+  const el=document.getElementById("gem-msg");
+  const key=document.getElementById("set-gemkey").value.trim();
+  if(!key){ if(el) el.innerHTML='<span class="danger">Paste your key first, then fetch.</span>'; return; }
+  if(el) el.textContent="Fetching model list…";
+  try{
+    const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=100&key="+encodeURIComponent(key));
+    const j=await r.json();
+    if(j.error) throw new Error(j.error.message);
+    GEMLIST=(j.models||[])
+      .filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent"))
+      .map(m=>({id:m.name.replace(/^models\//,""),label:(m.displayName||m.name)}))
+      .filter(m=>/flash|pro/i.test(m.id)&&!/embedding|image|tts|audio|live|vision/i.test(m.id));
+    S.gemKey=key; save(); render();
+  }catch(e){ if(el) el.innerHTML='<span class="danger">'+esc(e.message)+"</span>"; }
+}
+function openSettings(){ go('set'); }
+function setPref(k,v){ S[k]=v; save(); render(); }
+function saveAI(){
+  if(S.provider==="gemini"){
+    S.gemKey=document.getElementById("set-gemkey").value.trim();
+    const m=document.getElementById("set-gemmodel"); if(m&&m.value) S.gemModel=m.value;
+  }else{
+    S.apiKey=document.getElementById("set-key").value.trim();
+    S.model=document.getElementById("set-model").value;
+  }
+  save(); render();
+}
+function exportProgress(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="aplus-progress-"+todayStr()+".json";
+  a.click();
+}
+function importProgress(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const j=JSON.parse(r.result);
+      if(!j.qstats||!j.focus) throw 0;
+      localStorage.setItem(KEY,JSON.stringify(j));
+      location.reload();
+    }catch(e){ alert("That file doesn't look like an A+ Study Hub export."); }
+  };
+  r.readAsText(f);
+}
+function seg(pairs,key){
+  return `<div class="seg">${pairs.map(([v,l])=>`<button class="${S[key]===v?'active':''}" onclick="setPref('${key}',${typeof v==="string"?`'${v}'`:v})">${l}</button>`).join("")}</div>`;
+}
+function settingsView(){
+  const t=todayStr();
+  return `
+  <div class="card"><h2>${ic("sparkles")}AI setup</h2>
+    <div class="set-row"><span>Provider</span>${seg([["gemini","Google Gemini — free"],["anthropic","Anthropic — paid"]],"provider")}</div>
+    ${S.provider==="gemini"?`
+    <p class="muted" style="margin:10px 0">Get a <b>free</b> key (no credit card) at <b>aistudio.google.com/apikey</b> — sign in with Google → Create API key. Free tier: ~10 requests/min, plenty for studying. Stored <b>only in this browser on your machine</b>, sent only to Google.</p>
+    <label class="muted">Gemini API key — ${S.gemKey?`<span style="color:var(--good)">${ic("check")} saved</span>`:'<span class="danger">not set</span>'}</label>
+    <input class="inp" id="set-gemkey" type="password" style="width:100%;margin:6px 0 10px" value="${esc(S.gemKey)}" placeholder="AIza...">
+    <label class="muted">Model</label>
+    <select class="inp" id="set-gemmodel" style="width:100%;margin:6px 0 12px">
+      ${(GEMLIST||[{id:"gemini-3-flash",label:"Gemini 3 Flash (recommended free model)"},{id:"gemini-2.5-flash",label:"Gemini 2.5 Flash"}])
+        .map(m=>`<option value="${m.id}" ${S.gemModel===m.id?"selected":""}>${esc(m.label)}</option>`).join("")}
+    </select>
+    <div class="row">
+      <button class="btn small" onclick="saveAI()">Save AI settings</button>
+      <button class="btn small secondary" onclick="gemFetchModels()">↻ Fetch live model list</button>
+    </div>
+    <div id="gem-msg" class="muted" style="margin-top:8px">If a model errors, hit "Fetch live model list" to pull the current free models straight from Google.</div>`
+    :`
+    <p class="muted" style="margin:10px 0">Key from console.anthropic.com → API keys (paid, a study session costs a few cents). Stored <b>only in this browser on your machine</b>, sent only to Anthropic.</p>
+    <label class="muted">API key — ${S.apiKey?`<span style="color:var(--good)">${ic("check")} saved</span>`:'<span class="danger">not set</span>'}</label>
+    <input class="inp" id="set-key" type="password" style="width:100%;margin:6px 0 10px" value="${esc(S.apiKey)}" placeholder="sk-ant-...">
+    <label class="muted">Model</label>
+    <select class="inp" id="set-model" style="width:100%;margin:6px 0 12px">
+      <option value="claude-haiku-4-5-20251001" ${S.model==="claude-haiku-4-5-20251001"?"selected":""}>Claude Haiku 4.5 — fast &amp; cheap (recommended)</option>
+      <option value="claude-sonnet-5" ${S.model==="claude-sonnet-5"?"selected":""}>Claude Sonnet 5 — smarter, pricier</option>
+    </select>
+    <button class="btn small" onclick="saveAI()">Save AI settings</button>`}
+  </div>
+  <div class="card"><h2>${ic("sliders")}Appearance</h2>
+    <div class="set-row"><span>Theme</span>${seg([["dark",ic("moon")+"Dark"],["light",ic("sun")+"Light"]],"theme")}</div>
+  </div>
+  <div class="card"><h2>${ic("pencil")}Quiz preferences</h2>
+    <div class="set-row"><span>Questions per quick quiz</span>${seg([[5,"5"],[10,"10"],[15,"15"],[20,"20"]],"quizLen")}</div>
+    <div class="set-row"><span>Shuffle answer positions<div class="muted" style="font-size:.75rem">Stops you memorizing "the answer is B"</div></span>${seg([[true,"On"],[false,"Off"]],"shuffleOpts")}</div>
+    <div class="set-row"><span>Feedback timing<div class="muted" style="font-size:.75rem">"End of quiz" mimics the real exam</div></span>${seg([["each","After each"],["end","End of quiz"]],"feedback")}</div>
+  </div>
+  <div class="card"><h2>${ic("target")}Exam &amp; goals</h2>
+    <div class="set-row"><span>Exam date</span>
+      <input class="inp" type="date" value="${S.examDate}" min="${t}" onchange="setPref('examDate',this.value)"></div>
+    <div class="set-row"><span>Daily question goal</span>${seg([[10,"10"],[20,"20"],[30,"30"],[50,"50"]],"dailyGoal")}</div>
+    <div class="muted" style="margin-top:8px">Today: ${S.daily.date===t?S.daily.count:0}/${S.dailyGoal} · Streak: ${ic("flame")} ${S.streak.count} day${S.streak.count===1?"":"s"}</div>
+  </div>
+  <div class="card"><h2>${ic("db")}Data</h2>
+    <div class="row">
+      <button class="btn secondary small" onclick="exportProgress()">${ic("down")} Export progress</button>
+      <label class="btn secondary small" style="cursor:pointer">${ic("up")} Import progress<input type="file" accept=".json" style="display:none" onchange="importProgress(event)"></label>
+      <button class="btn secondary small" style="color:var(--bad)" onclick="confirmReset()">Reset everything</button>
+    </div>
+    <div class="muted" style="margin-top:8px">Export now and then — a browser data wipe would otherwise erase your stats, AI-generated questions and API key. Imports work across browsers and computers.</div>
+  </div>`;
+}
+
+/* ---- AI tutor tab ---- */
+const AIC={msgs:[],busy:false};
+function tutorSystem(){
+  const g=gapScores();
+  return "You are a friendly, expert CompTIA A+ tutor helping a student pass the current exams (Core 1 220-1201 and Core 2 220-1202). "
+   + "Student's per-domain accuracy so far: "
+   + g.map(x=>x.name+": "+(x.acc===null?"untested":Math.round(x.acc*100)+"%")).join("; ")
+   + ". Weakest areas first: "+g.slice(0,3).map(x=>x.name).join(", ")
+   + ". Be concise, exam-focused, use analogies, and when quizzing ask one question at a time and wait for the answer.";
+}
+function aiView(){
+  if(!aiReady()) return `<div class="card center">
+    <h2>AI Tutor</h2>
+    <p class="muted" style="margin:12px 0">Connect a free Google Gemini API key (or Anthropic) to unlock a personal A+ tutor — it knows your weak domains and can explain, quiz, and coach you conversationally.</p>
+    <button class="btn" onclick="openSettings()">${ic("gear")} Set up AI</button></div>`;
+  const chips=["Quiz me on my weakest domain","Explain RAID levels with an analogy","Make a 2-week study plan for me","What PBQs should I practice?"];
+  return `<div class="card">
+    <h2>AI Tutor <span class="muted" style="font-weight:400">— knows your progress</span></h2>
+    <div class="chat-box" id="chat-scroll">
+      ${AIC.msgs.length? AIC.msgs.map(m=>`<div class="msg ${m.r}">${esc(m.t)}</div>`).join("")
+        : `<div class="msg think">Ask me anything about the A+ — or tap a suggestion below.</div>`}
+      ${AIC.busy?'<div class="msg think">Thinking…</div>':""}
+    </div>
+    <div class="chat-input">
+      <input id="chat-in" placeholder="Ask your tutor…" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn small" onclick="sendChat()">Send</button>
+    </div>
+    <div class="row" style="margin-top:10px">${chips.map(c=>`<button class="btn small secondary" onclick="document.getElementById('chat-in').value='${c.replace(/'/g,"\\'")}';sendChat()">${c}</button>`).join("")}</div>
+  </div>`;
+}
+async function sendChat(){
+  const el=document.getElementById("chat-in"); const txt=el?el.value.trim():"";
+  if(!txt||AIC.busy) return;
+  AIC.msgs.push({r:"user",t:txt}); AIC.busy=true; render();
+  try{
+    const hist=AIC.msgs.map(m=>({role:m.r==="user"?"user":"assistant",content:m.t}));
+    const out=await callClaude(hist, tutorSystem(), 900);
+    AIC.msgs.push({r:"ai",t:out});
+  }catch(e){ AIC.msgs.push({r:"ai",t:"Error: "+e.message}); }
+  AIC.busy=false; render();
+}
+
+/* ---- in-quiz Ask AI ---- */
+function askAboutQ(){ quiz.qchat=quiz.qchat||{msgs:[],busy:false}; renderQChat(); }
+function renderQChat(){
+  const el=document.getElementById("qchat"); if(!el||!quiz.qchat) return;
+  const c=quiz.qchat;
+  el.innerHTML=`<div class="chat-box" style="margin-top:12px;max-height:280px">
+    ${c.msgs.length? c.msgs.map(m=>`<div class="msg ${m.r}">${esc(m.t)}</div>`).join("")
+      : '<div class="msg think">Ask anything — "explain this like I\'m brand new", "why is option B wrong?", "give me a memory trick"…</div>'}
+    ${c.busy?'<div class="msg think">Thinking…</div>':""}
+  </div>
+  <div class="chat-input"><input id="qchat-in" placeholder="Ask about this question…" onkeydown="if(event.key==='Enter')sendQChat()">
+  <button class="btn small" onclick="sendQChat()">Send</button></div>`;
+  const box=el.querySelector(".chat-box"); box.scrollTop=box.scrollHeight;
+  const inp=document.getElementById("qchat-in"); if(inp) inp.focus();
+}
+async function sendQChat(){
+  const inp=document.getElementById("qchat-in"); const txt=inp?inp.value.trim():"";
+  if(!txt||quiz.qchat.busy) return;
+  const q=quiz.items[quiz.idx];
+  quiz.qchat.msgs.push({r:"user",t:txt}); quiz.qchat.busy=true; renderQChat();
+  const sys="You are a CompTIA A+ tutor. The student just answered this practice question:\nQ: "+q.q
+    +"\nOptions: "+q.o.map((o,i)=>String.fromCharCode(65+i)+") "+o).join(" | ")
+    +"\nCorrect answer: "+String.fromCharCode(65+q.a)+") "+q.o[q.a]
+    +"\nExplanation: "+q.e
+    +"\nThe student answered "+(quiz.answered===q.a?"correctly":"incorrectly, choosing "+String.fromCharCode(65+quiz.answered)+") "+q.o[quiz.answered])
+    +". Answer their follow-up concisely and helpfully.";
+  try{
+    const hist=quiz.qchat.msgs.map(m=>({role:m.r==="user"?"user":"assistant",content:m.t}));
+    const out=await callClaude(hist, sys, 600);
+    quiz.qchat.msgs.push({r:"ai",t:out});
+  }catch(e){ quiz.qchat.msgs.push({r:"ai",t:"Error: "+e.message}); }
+  quiz.qchat.busy=false; renderQChat();
+}
+
+/* ---- AI question generation ---- */
+async function runGen(){
+  const sel=document.getElementById("gen-dom"); const btn=document.getElementById("gen-btn");
+  const domId=sel.value, dom=DOMAINS.find(d=>d.id===domId);
+  btn.disabled=true; btn.textContent="Generating… (few seconds)";
+  const prompt="Generate 5 challenging multiple-choice practice questions for the CompTIA A+ exams "
+   +"(220-1201/220-1202), domain: \""+dom.name+"\". Match the real exam's style: scenario-based where possible. "
+   +"Do not repeat these existing topics too closely: "
+   + QUESTIONS.filter(q=>q.d===domId).slice(0,20).map(q=>q.q).join(" ~ ").slice(0,1500)
+   +". Respond with ONLY a JSON array, no markdown fences, in this exact shape: "
+   +'[{"q":"question text","o":["opt1","opt2","opt3","opt4"],"a":0,"e":"explanation"}] where a is the index of the correct option.';
+  try{
+    let out=await callClaude([{role:"user",content:prompt}], "You output only valid JSON.", 2500);
+    out=out.replace(/^```(json)?/m,"").replace(/```\s*$/m,"").trim();
+    const arr=JSON.parse(out.slice(out.indexOf("["), out.lastIndexOf("]")+1));
+    const good=arr.filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&x.a>=0&&x.a<4&&x.e)
+      .map(x=>({d:domId,q:x.q,o:x.o,a:x.a,e:x.e,ai:true}));
+    if(!good.length) throw new Error("The AI returned no usable questions — try again.");
+    const startIdx=QUESTIONS.length;
+    QUESTIONS.push(...good); S.aiQ.push(...good); save();
+    const items=good.map((q,k)=>({...q,i:startIdx+k}));
+    quiz={items:prep(items),idx:0,right:0,answered:null,results:[]}; tab="quiz"; render();
+  }catch(e){
+    btn.disabled=false; btn.innerHTML=ic("zap")+" Generate 5 AI questions";
+    document.getElementById("gen-msg").innerHTML='<span class="danger">'+esc(e.message)+"</span>";
+  }
+}
+
+/* ================= LABS ================= */
+function openLab(l){
+  lab=l;
+  if(l==="term") termInit();
+  if(l==="pbq") pbqInit();
+  if(l==="pc") pcInit();
+  render();
+}
+function labsHubView(){
+  const tiles=[
+    ["cable",ic("plug"),"3D Cable & Connector Lab","Rotate RJ45, fiber, coax and USB-C in 3D — specs, speeds and exam parameters for each."],
+    ["pbq",ic("layers"),"PBQ Practice Lab","Drag-and-drop ordering tasks that mirror real exam PBQs — laser printing, malware removal, T568B wiring."],
+    ["term",ic("term"),"Terminal Troubleshooting Sim","A broken network and a command prompt. Diagnose it with ipconfig, ping, tracert and nslookup."],
+    ["pc",ic("pc"),"Virtual PC Builder","Install the CPU, RAM, GPU, storage and power cables into the right spots on a motherboard."],
+  ];
+  return `<div class="card"><h2>Interactive Labs</h2>
+    <div class="muted" style="margin-bottom:14px">Hands-on practice — the real exams include performance-based questions, so build the muscle memory here.</div>
+    ${tiles.map(t=>`<div class="lab-tile" onclick="openLab('${t[0]}')">
+      <div class="ico">${t[1]}</div><div><div style="font-weight:700">${t[2]}</div><div class="meta">${t[3]}</div></div></div>`).join("")}
+  </div>`;
+}
+function labView(){
+  const back=`<button class="btn small secondary" style="margin-bottom:12px" onclick="lab=null;stop3D();render()">← All labs</button>`;
+  if(lab==="cable") return back+cableView();
+  if(lab==="pbq") return back+pbqView();
+  if(lab==="term") return back+termView();
+  if(lab==="pc") return back+pcView();
+  return back;
+}
+
+/* ---- PBQ lab ---- */
+const PBQS=[
+ {id:"laser",name:"Laser printing process",tip:"Processing → charging → exposing → developing → transferring → fusing → cleaning. Mnemonic: People Can't Expect Delivery Til Friday, Comrade.",
+  items:["Processing","Charging","Exposing","Developing","Transferring","Fusing","Cleaning"]},
+ {id:"malware",name:"Malware removal steps",tip:"Disabling System Restore BEFORE remediating is the step everyone forgets — infected restore points can reinfect the machine.",
+  items:["Identify and verify malware symptoms","Quarantine the infected system","Disable System Restore","Remediate: update anti-malware and scan in Safe Mode","Schedule scans and run updates","Re-enable System Restore and create a restore point","Educate the end user"]},
+ {id:"ts",name:"Troubleshooting methodology",tip:"Identify → theory → test → plan → implement → verify → document. Verifying FULL functionality comes before documenting.",
+  items:["Identify the problem","Establish a theory of probable cause","Test the theory to determine the cause","Establish a plan of action","Implement the solution","Verify full system functionality","Document findings, actions and outcomes"]},
+ {id:"t568b",name:"T568B wiring order (pin 1 → 8)",tip:"White/orange leads, blue pair sits in the middle, brown pair last. T568A swaps the orange and green pairs.",
+  items:["White/Orange","Orange","White/Green","Blue","White/Blue","Green","White/Brown","Brown"]},
+];
+const WCOL={"White/Orange":["#fff","#f97316"],"Orange":["#f97316","#f97316"],"White/Green":["#fff","#22c55e"],"Green":["#22c55e","#22c55e"],"Blue":["#3b82f6","#3b82f6"],"White/Blue":["#fff","#3b82f6"],"White/Brown":["#fff","#92400e"],"Brown":["#92400e","#92400e"]};
+let P={ex:null,seq:[],pool:[],checked:false};
+function pbqInit(){ P={ex:null,seq:[],pool:[],checked:false}; }
+function pbqPick(id){
+  const ex=PBQS.find(p=>p.id===id);
+  P={ex,seq:[],pool:shuffle(ex.items.slice()),checked:false}; render();
+}
+function pbqAdd(i){ if(P.checked)return; P.seq.push(P.pool.splice(i,1)[0]); render(); }
+function pbqRemove(i){ if(P.checked)return; P.pool.push(P.seq.splice(i,1)[0]); render(); }
+function pbqCheck(){ P.checked=true; render(); }
+function pbqReset(){ pbqPick(P.ex.id); }
+function wireDot(t){ const c=WCOL[t]; return c?`<span class="wire" style="background:linear-gradient(90deg,${c[0]} 50%,${c[1]} 50%)"></span>`:""; }
+function pbqView(){
+  const chips=`<div class="conn-chips">${PBQS.map(p=>`<button class="${P.ex&&P.ex.id===p.id?'active':''}" onclick="pbqPick('${p.id}')">${p.name}</button>`).join("")}</div>`;
+  if(!P.ex) return `<div class="card"><h2>PBQ Practice Lab</h2>
+    <div class="muted" style="margin-bottom:12px">These ordering tasks appear on the real exam as drag-and-drop PBQs. Pick one:</div>${chips}</div>`;
+  const done=P.seq.length===P.ex.items.length;
+  const allOk=P.checked && P.seq.every((s,i)=>s===P.ex.items[i]);
+  return `<div class="card"><h2>PBQ Practice Lab</h2>${chips}
+    <h3>${P.ex.name}</h3>
+    <div class="muted" style="margin-bottom:10px">Tap items below to place them in order. Tap a placed item to remove it.</div>
+    ${P.ex.items.map((_,i)=>{
+      const v=P.seq[i];
+      let cls="pbq-slot"+(v?" filled":"");
+      if(P.checked&&v) cls+= v===P.ex.items[i]?" ok":" bad";
+      return `<div class="${cls}" onclick="${v?`pbqRemove(${i})`:""}"><span class="n">${i+1}</span>${v?wireDot(v)+esc(v):'<span class="muted">— drop here —</span>'}</div>`;
+    }).join("")}
+    <div class="pbq-pool">${P.pool.map((p,i)=>`<div class="pbq-chip" onclick="pbqAdd(${i})">${wireDot(p)}${esc(p)}</div>`).join("")}</div>
+    <div class="row">
+      <button class="btn" ${done&&!P.checked?"":"disabled"} onclick="pbqCheck()">Check order</button>
+      <button class="btn secondary" onclick="pbqReset()">Reset</button>
+    </div>
+    ${P.checked?`<div class="explain" style="margin-top:12px">${allOk?OKI+" Perfect — that's the exact exam order. ":BADI+" Not quite — red rows are misplaced. Correct order: "+P.ex.items.join(" → ")+". "}<br><br>${BULB} ${P.ex.tip}</div>`:""}
+  </div>`;
+}
+
+/* ---- Terminal sim ---- */
+let T={scen:null,lines:[]};
+const SCENS=[
+ {id:"dhcp",ip:"169.254.23.101",mask:"255.255.0.0",gw:"",dns:"",
+  hint:"Run ipconfig and look hard at the IPv4 address. What range does 169.254.x.x belong to, and who hands out addresses normally?",
+  explain:"169.254.x.x is an APIPA address — Windows assigns it to itself when no DHCP server responds. With no real IP, gateway or DNS, nothing off-machine works. Fix: restore DHCP connectivity (check the DHCP server, VLAN, cable/switch port), then ipconfig /renew."},
+ {id:"dns",ip:"192.168.1.42",mask:"255.255.255.0",gw:"192.168.1.1",dns:"192.168.1.53",
+  hint:"Try pinging a raw IP like 8.8.8.8, then ping a hostname like google.com. Which one works?",
+  explain:"Pinging 8.8.8.8 works but names fail — connectivity is fine, name resolution is broken: a DNS problem. Fix: point the client at a working DNS server (or fix the DNS server), then ipconfig /flushdns."},
+ {id:"gateway",ip:"192.168.1.42",mask:"255.255.255.0",gw:"192.168.1.1",dns:"8.8.8.8",
+  hint:"Ping another local machine like 192.168.1.7, then ping the default gateway 192.168.1.1. Compare.",
+  explain:"Local peers reply but the default gateway doesn't — the router (default gateway) is down or unreachable, so nothing beyond the LAN works. tracert dies at the first hop. Fix: power-cycle/repair the router or its switch link."},
+];
+function termInit(){
+  T={scen:SCENS[Math.floor(Math.random()*SCENS.length)],lines:[]};
+  tp("Ticket #4821 — user reports: \"the internet is down on my PC.\"","sys");
+  tp("Investigate with: ipconfig [/all|/renew|/flushdns], ping <ip|name>, tracert <ip|name>, nslookup <name>","sys");
+  tp("When you're confident:  diagnose dhcp | dns | gateway     (also: hint, new, clear, help)","sys");
+  tp("");
+}
+function tp(t,c){ T.lines.push({t,c:c||""}); }
+function termSubmit(ev){ if(ev.key!=="Enter")return; const i=ev.target; termExec(i.value); i.value=""; render(); }
+function termExec(raw){
+  const cmd=raw.trim(); if(!cmd) return;
+  tp("C:\\Users\\tafe> "+cmd,"cmd");
+  const s=T.scen, p=cmd.toLowerCase().split(/\s+/), c0=p[0];
+  const isName=t=>/[a-z]/i.test(t)&&!/^\d+(\.\d+){3}$/.test(t);
+  const local=t=>t.startsWith("192.168.1.")&&t!==s.gw;
+  if(c0==="help"){ tp("Commands: ipconfig [/all|/renew|/flushdns], ping <target>, tracert <target>, nslookup <name>, diagnose <dhcp|dns|gateway>, hint, new, clear"); }
+  else if(c0==="clear"){ T.lines=[]; }
+  else if(c0==="new"){ termInit(); }
+  else if(c0==="hint"){ tp(">> HINT: "+s.hint,"sys"); }
+  else if(c0==="ipconfig"){
+    if(p[1]==="/renew"){
+      if(s.id==="dhcp"){ tp("An error occurred while renewing interface Ethernet0:","err"); tp("unable to contact your DHCP server. Request has timed out.","err"); }
+      else tp("IPv4 Address renewed: "+s.ip);
+    } else if(p[1]==="/flushdns"){ tp("Successfully flushed the DNS Resolver Cache."+(s.id==="dns"?" (Names still fail — the cache wasn't the problem.)":"")); }
+    else {
+      tp("Ethernet adapter Ethernet0:"); tp("");
+      tp("   IPv4 Address. . . . . . . . . . . : "+s.ip+(s.id==="dhcp"?"  (Autoconfiguration)":""));
+      tp("   Subnet Mask . . . . . . . . . . . : "+s.mask);
+      tp("   Default Gateway . . . . . . . . . : "+(s.gw||""));
+      if(p[1]==="/all"){ tp("   DHCP Enabled. . . . . . . . . . . : Yes"); tp("   DNS Servers . . . . . . . . . . . : "+(s.dns||"")); }
+    }
+  }
+  else if(c0==="ping"){
+    const t=p[1]; if(!t){ tp("Usage: ping <ip or hostname>","err"); }
+    else if(t==="127.0.0.1"||t===s.ip){ tp("Reply from "+t+": bytes=32 time<1ms TTL=128  (x4)","ok"); }
+    else if(s.id==="dhcp"){ tp("PING: transmit failed. General failure.  (x4)","err"); }
+    else if(isName(t)){
+      if(s.id==="dns"||s.id==="gateway") tp("Ping request could not find host "+t+". Please check the name and try again.","err");
+      else tp("Reply from 142.250.72.14: bytes=32 time=18ms TTL=115  (x4)","ok");
+    }
+    else if(s.id==="gateway"){
+      if(local(t)) tp("Reply from "+t+": bytes=32 time=1ms TTL=128  (x4)","ok");
+      else tp("Request timed out.  (x4)","err");
+    }
+    else { tp("Reply from "+t+": bytes=32 time="+(local(t)?"1":"17")+"ms TTL=115  (x4)","ok"); }
+  }
+  else if(c0==="tracert"){
+    const t=p[1]; if(!t){ tp("Usage: tracert <target>","err"); }
+    else if(s.id==="dhcp"){ tp("Unable to contact IP driver. General failure.","err"); }
+    else if(isName(t)&&(s.id==="dns"||s.id==="gateway")){ tp("Unable to resolve target system name "+t+".","err"); }
+    else if(s.id==="gateway"){ tp("Tracing route to "+t+":"); tp("  1     *        *        *     Request timed out.","err"); tp("  2     *        *        *     Request timed out.","err"); }
+    else { tp("Tracing route to "+t+":"); tp("  1     1 ms   192.168.1.1","ok"); tp("  2    11 ms   100.64.0.1","ok"); tp("  3    17 ms   "+(isName(t)?"142.250.72.14":t),"ok"); }
+  }
+  else if(c0==="nslookup"){
+    const t=p[1]||"google.com";
+    if(s.id==="dhcp"){ tp("DNS request timed out. Default Server: UnKnown","err"); }
+    else if(s.id==="dns"){ tp("Server: "+s.dns); tp("DNS request timed out. *** Request to "+s.dns+" timed-out","err"); }
+    else if(s.id==="gateway"){ tp("Server: "+s.dns); tp("DNS request timed out. *** Request to "+s.dns+" timed-out","err"); }
+    else { tp("Name: "+t); tp("Address: 142.250.72.14","ok"); }
+  }
+  else if(c0==="diagnose"){
+    const g=p[1];
+    if(!g){ tp("Usage: diagnose <dhcp|dns|gateway>","err"); }
+    else if(g===s.id){ tp("[CORRECT] Diagnosis confirmed.","ok"); tp(s.explain,"ok"); tp(""); tp("Type  new  for another random ticket.","sys"); }
+    else { tp("[WRONG] Not the root cause here. Re-check the evidence — try hint if stuck.","err"); }
+  }
+  else { tp("'"+c0+"' is not recognized. Type help for commands.","err"); }
+}
+function termView(){
+  return `<div class="card"><h2>Terminal Troubleshooting Sim</h2>
+    <div class="muted" style="margin-bottom:10px">A random network fault is active. Work the ticket like a real tech — gather evidence, then commit to a diagnosis.</div>
+    <div class="term" id="term-out">${T.lines.map(l=>`<div class="${l.c}">${esc(l.t)}</div>`).join("")}</div>
+    <div class="term-input"><span>C:\\Users\\tafe&gt;</span><input id="term-in" autocomplete="off" spellcheck="false" onkeydown="termSubmit(event)"></div>
+  </div>`;
+}
+
+/* ---- PC builder ---- */
+let PC=null;
+const PC_ZONES=[
+ {id:"cpu",  label:"LGA1700 CPU socket", x:8,  y:12, w:24, h:22},
+ {id:"eps",  label:"8-pin EPS (CPU pwr)",x:8,  y:2,  w:14, h:8},
+ {id:"ram",  label:"DDR5 DIMM slots",    x:40, y:8,  w:9,  h:44},
+ {id:"atx",  label:"24-pin ATX",         x:88, y:14, w:9,  h:30},
+ {id:"m2",   label:"M.2 slot",           x:10, y:44, w:22, h:8},
+ {id:"pcie", label:"PCIe x16",           x:6,  y:60, w:52, h:8},
+ {id:"sata", label:"SATA ports",         x:78, y:78, w:18, h:12},
+];
+const PC_PARTS=[
+ {id:"cpu", icon:"chip", name:"CPU",              zone:"cpu",  why:"The CPU drops into the CPU socket — align the corner triangle, zero force."},
+ {id:"ram", icon:"ram",  name:"DDR5 DIMM",        zone:"ram",  why:"RAM goes in the DIMM slots next to the CPU. For dual-channel, use matching slots (usually 2 & 4)."},
+ {id:"ssd", icon:"drive",name:"NVMe SSD",         zone:"m2",   why:"An NVMe drive mounts flat into the M.2 slot — one screw, no cables."},
+ {id:"gpu", icon:"gpu",  name:"Graphics card",    zone:"pcie", why:"GPUs need the full-length PCIe x16 slot for maximum bandwidth."},
+ {id:"atxc",icon:"plug", name:"24-pin ATX cable", zone:"atx",  why:"The 24-pin ATX connector is the motherboard's main power feed."},
+ {id:"epsc",icon:"zap",  name:"8-pin EPS cable",  zone:"eps",  why:"The 8-pin EPS connector near the CPU powers the processor. Don't confuse it with PCIe power!"},
+ {id:"satc",icon:"link", name:"SATA data cable",  zone:"sata", why:"SATA data cables link 2.5\"/3.5\" drives to the board's SATA ports."},
+];
+function pcInit(){ PC={sel:null,placed:{},good:null,msg:"Select a part, then click where it belongs on the board."}; }
+function pcSelect(id){ if(PC.placed[id])return; PC.sel=id; PC.good=null; PC.msg="Now click the right spot for it on the motherboard."; render(); }
+function pcDrop(zoneId){
+  if(!PC.sel){ PC.good=null; PC.msg="Pick a part from the tray first."; render(); return; }
+  const part=PC_PARTS.find(p=>p.id===PC.sel);
+  if(part.zone===zoneId){
+    PC.placed[part.id]=true; PC.sel=null;
+    const left=PC_PARTS.filter(p=>!PC.placed[p.id]).length;
+    PC.good=true; PC.msg=part.why+(left?"":"  Build complete — POST successful!");
+  } else {
+    const z=PC_ZONES.find(z=>z.id===zoneId);
+    PC.good=false; PC.msg="The "+part.name+" doesn't go in the "+z.label+". "+part.why;
+  }
+  render();
+}
+function pcView(){
+  const doneAll=PC_PARTS.every(p=>PC.placed[p.id]);
+  return `<div class="card"><h2>Virtual PC Builder</h2>
+    <div class="muted" style="margin-bottom:10px">${PC.good===true?OKI+" ":PC.good===false?BADI+" ":""}${esc(PC.msg)}</div>
+    <div class="mobo">
+      ${PC_ZONES.map(z=>{
+        const filled=PC_PARTS.some(p=>p.zone===z.id&&PC.placed[p.id]);
+        return `<div class="zone ${filled?'done':(PC.sel?'hot':'')}" style="left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%"
+          onclick="pcDrop('${z.id}')">${filled?ic("check")+" "+z.label:z.label}</div>`;
+      }).join("")}
+    </div>
+    <div class="parts">${PC_PARTS.map(p=>`<div class="part ${PC.sel===p.id?'sel':''} ${PC.placed[p.id]?'used':''}" onclick="pcSelect('${p.id}')">${ic(p.icon)}${p.name}</div>`).join("")}</div>
+    ${doneAll?`<div class="explain" style="margin-top:12px"><span style="color:var(--warn)">${ic("trophy")}</span> Fully assembled! Exam takeaways: CPU power = 8-pin EPS (top-left of board), main power = 24-pin ATX, GPU = PCIe x16, NVMe = M.2 (no cables), SATA drives need BOTH a data cable and PSU power.</div>
+    <button class="btn secondary" style="margin-top:10px" onclick="pcInit();render()">Rebuild</button>`:""}
+  </div>`;
+}
+
+/* ---- 3D cable lab ---- */
+const CONNECTORS=[
+ {id:"rj45",name:"RJ45 (8P8C)",cable:"Twisted pair — Cat5e / Cat6 / Cat6a",speed:"1 Gbps (Cat5e) · 10 Gbps ≤55 m (Cat6) · 10 Gbps 100 m (Cat6a)",dist:"100 meters",use:"Ethernet LANs — the everyday network cable",tip:"Know cable categories cold. T568B pinout is a PBQ favorite. 8 positions, 8 conductors."},
+ {id:"rj11",name:"RJ11 (6P4C)",cable:"Untwisted / lightly twisted copper pair",speed:"Voice + DSL (up to ~100 Mbps DSL)",dist:"Short runs (phone wiring)",use:"Analog telephone lines and DSL modems",tip:"Smaller than RJ45 — a classic 'identify the connector' question. 6 positions, usually 4 conductors."},
+ {id:"lc",name:"Fiber — LC",cable:"Fiber optic (SMF or MMF)",speed:"1–100+ Gbps",dist:"MMF: 300–550 m · SMF: 10+ km",use:"High-density switches, SFP transceivers, datacenters",tip:"LC = 'Little Connector' — small square snap-in latch. The most common modern fiber connector."},
+ {id:"sc",name:"Fiber — SC",cable:"Fiber optic (SMF or MMF)",speed:"1–100+ Gbps",dist:"MMF: 300–550 m · SMF: 10+ km",use:"Older patch panels, FTTH equipment",tip:"SC = 'Square Connector / Stick-and-Click' — push-pull square body, larger than LC."},
+ {id:"st",name:"Fiber — ST",cable:"Fiber optic (usually MMF)",speed:"Legacy fiber speeds",dist:"MMF: up to ~2 km",use:"Legacy fiber installs",tip:"ST = 'Stick-and-Twist' — round bayonet that twists to lock. The round one in ID questions."},
+ {id:"coax",name:"Coax — F-type",cable:"Coaxial RG-6 (or legacy RG-59)",speed:"Cable internet (DOCSIS) — 1 Gbps+",dist:"Hundreds of meters",use:"Cable modems, TV distribution",tip:"F-type screws on by its hex nut. RG-6 for modern cable internet; RG-59 is legacy/short runs. Center pin = the copper core itself."},
+ {id:"usbc",name:"USB-C",cable:"USB 3.x / USB4 / Thunderbolt",speed:"10–40 Gbps (USB4/TB4) · up to 240 W PD",dist:"~1–2 m passive",use:"Phones, laptops, docks, displays, charging",tip:"Reversible 24-pin connector. Can carry data, video (DP alt mode) AND power — know that one port can do all three."},
+];
+let C3D={cur:"rj45",raf:null,renderer:null,scene:null,camera:null,group:null,drag:false,px:0,py:0,idle:0};
+function stop3D(){ if(C3D.raf){cancelAnimationFrame(C3D.raf);C3D.raf=null;} C3D.renderer=null; }
+function cableView(){
+  const c=CONNECTORS.find(x=>x.id===C3D.cur);
+  return `<div class="card"><h2>3D Cable &amp; Connector Lab</h2>
+    <div class="conn-chips">${CONNECTORS.map(x=>`<button class="${x.id===C3D.cur?'active':''}" onclick="C3D.cur='${x.id}';stop3D();render()">${x.name}</button>`).join("")}</div>
+    <canvas id="c3d"></canvas>
+    <div class="muted center" style="margin:6px 0 14px">drag to rotate · scroll/pinch to zoom</div>
+    <h3>${c.name}</h3>
+    <dl class="spec-grid">
+      <dt>Cable</dt><dd>${c.cable}</dd>
+      <dt>Speed</dt><dd>${c.speed}</dd>
+      <dt>Max distance</dt><dd>${c.dist}</dd>
+      <dt>Used for</dt><dd>${c.use}</dd>
+    </dl>
+    <div class="explain" style="margin-top:12px">${ic("pencil")} Exam: ${c.tip}</div>
+  </div>`;
+}
+function M(color,opts){ return new THREE.MeshStandardMaterial(Object.assign({color,roughness:.45,metalness:.25},opts||{})); }
+function box(g,w,h,d,x,y,z,mat){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat); m.position.set(x,y,z); g.add(m); return m; }
+function cyl(g,rt,rb,h,x,y,z,mat,seg,rotZ){ const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg||24),mat); m.position.set(x,y,z); if(rotZ!==undefined)m.rotation.z=rotZ; g.add(m); return m; }
+function buildModel(id){
+  const g=new THREE.Group();
+  const gold=M(0xd4af37,{metalness:.85,roughness:.25}), body=M(0x9fb6d9,{transparent:true,opacity:.5}),
+        plastic=M(0x2f6fd4), white=M(0xf2f2f2), dark=M(0x22262e), blue=M(0x1f6feb), cable=M(0x3a4356);
+  const wireCols=[0xffffff,0xf97316,0xffffff,0x3b82f6,0xffffff,0x22c55e,0xffffff,0x92400e];
+  if(id==="rj45"||id==="rj11"){
+    const n=id==="rj45"?8:4, w=id==="rj45"?2.2:1.6;
+    box(g,w,1.2,3.2,0,0,0,body);                      // clear housing
+    box(g,w*.7,.25,1.4,0,-.85,-.6,body);              // latch clip
+    for(let i=0;i<n;i++){ box(g,.14,.5,.9,-w/2+.25+i*(w-.5)/(n-1),.4,1.1,gold); }  // gold pins
+    for(let i=0;i<n;i++){ box(g,.16,.16,2.2,-w/2+.25+i*(w-.5)/(n-1),0,-.2,M(wireCols[i%8])); } // wires inside
+    cyl(g,.45,.45,2.2,0,0,-2.6,cable,20,Math.PI/2); g.children[g.children.length-1].rotation.set(Math.PI/2,0,0);
+  } else if(id==="lc"){
+    box(g,1,1,2.4,0,0,0,plastic);
+    box(g,.5,.3,1.2,0,.65,-.3,white);                 // latch
+    cyl(g,.16,.16,1.4,0,0,1.6,white); g.children[g.children.length-1].rotation.x=Math.PI/2;
+    cyl(g,.06,.06,1.7,0,0,1.8,gold); g.children[g.children.length-1].rotation.x=Math.PI/2;  // fiber core
+    cyl(g,.3,.3,2,0,0,-2.1,M(0xffb84d),20); g.children[g.children.length-1].rotation.x=Math.PI/2; // yellow SMF jacket
+  } else if(id==="sc"){
+    box(g,1.6,1.6,2.6,0,0,0,blue);
+    box(g,1.2,1.2,.6,0,0,1.5,white);
+    cyl(g,.18,.18,1.4,0,0,2.2,white); g.children[g.children.length-1].rotation.x=Math.PI/2;
+    cyl(g,.07,.07,1.8,0,0,2.4,gold); g.children[g.children.length-1].rotation.x=Math.PI/2;
+    cyl(g,.35,.35,2,0,0,-2.2,M(0xffb84d),20); g.children[g.children.length-1].rotation.x=Math.PI/2;
+  } else if(id==="st"){
+    cyl(g,.8,.8,2.2,0,0,0,dark,24); g.children[g.children.length-1].rotation.x=Math.PI/2;
+    box(g,.3,.25,.5,.85,0,-.6,dark); box(g,.3,.25,.5,-.85,0,-.6,dark);   // bayonet lugs
+    cyl(g,.2,.2,1.6,0,0,1.6,white); g.children[g.children.length-1].rotation.x=Math.PI/2;
+    cyl(g,.07,.07,2,0,0,1.8,gold); g.children[g.children.length-1].rotation.x=Math.PI/2;
+    cyl(g,.35,.35,2,0,0,-2,M(0xff8c42),20); g.children[g.children.length-1].rotation.x=Math.PI/2;
+  } else if(id==="coax"){
+    cyl(g,.85,.85,1.1,0,0,.4,M(0xbfc7d5,{metalness:.9,roughness:.3}),6);  // hex nut
+    g.children[g.children.length-1].rotation.x=Math.PI/2;
+    cyl(g,.55,.55,1.3,0,0,1.4,M(0xd9dee8,{metalness:.9,roughness:.2}),24); g.children[g.children.length-1].rotation.x=Math.PI/2; // threaded barrel
+    cyl(g,.07,.07,2.4,0,0,1.4,M(0xc47a3d,{metalness:.8}),12); g.children[g.children.length-1].rotation.x=Math.PI/2; // copper core pin
+    cyl(g,.5,.5,2.6,0,0,-1.4,dark,24); g.children[g.children.length-1].rotation.x=Math.PI/2;  // RG-6 jacket
+  } else if(id==="usbc"){
+    const oval=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,2.6,24),M(0xd9dee8,{metalness:.85,roughness:.25}));
+    oval.scale.set(1,1,.45); oval.rotation.z=Math.PI/2; g.add(oval);   // flattened metal shell
+    box(g,1.7,.18,1.4,0,0,0,dark);                                     // tongue
+    for(let i=0;i<8;i++) box(g,.12,.06,.5,-.8+i*.23,.13,.35,gold);
+    box(g,2,.9,1.6,0,0,-1.9,plastic);                                  // strain relief/body
+    cyl(g,.35,.35,1.8,0,0,-3.4,cable,20); g.children[g.children.length-1].rotation.x=Math.PI/2;
+  }
+  return g;
+}
+function init3D(){
+  const cv=document.getElementById("c3d"); if(!cv) return;
+  if(typeof THREE==="undefined"){ cv.outerHTML='<div class="card"><p class="muted">3D library couldn\'t load — check your internet connection and reopen this lab.</p></div>'; return; }
+  stop3D();
+  const wpx=cv.clientWidth||800, hpx=340;
+  const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+  renderer.setSize(wpx,hpx,false); renderer.setPixelRatio(window.devicePixelRatio||1);
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(45,wpx/hpx,.1,100); camera.position.set(0,1.4,7);
+  scene.add(new THREE.AmbientLight(0xffffff,.55));
+  const key=new THREE.DirectionalLight(0xffffff,.9); key.position.set(4,6,5); scene.add(key);
+  const rim=new THREE.DirectionalLight(0x9aa0aa,.5); rim.position.set(-5,-2,-4); scene.add(rim);
+  const group=buildModel(C3D.cur); group.rotation.set(.35,.7,0); scene.add(group);
+  Object.assign(C3D,{renderer,scene,camera,group,drag:false,idle:0});
+  cv.onpointerdown=e=>{C3D.drag=true;C3D.px=e.clientX;C3D.py=e.clientY;cv.setPointerCapture(e.pointerId);};
+  cv.onpointermove=e=>{ if(!C3D.drag)return;
+    group.rotation.y+=(e.clientX-C3D.px)*.01; group.rotation.x+=(e.clientY-C3D.py)*.01;
+    group.rotation.x=Math.max(-1.4,Math.min(1.4,group.rotation.x));
+    C3D.px=e.clientX;C3D.py=e.clientY;C3D.idle=0; };
+  cv.onpointerup=()=>{C3D.drag=false;};
+  cv.onwheel=e=>{e.preventDefault(); camera.position.z=Math.max(3.5,Math.min(14,camera.position.z+e.deltaY*.005));};
+  (function loop(){
+    C3D.raf=requestAnimationFrame(loop);
+    if(!C3D.drag){ C3D.idle++; if(C3D.idle>90) group.rotation.y+=.004; }
+    renderer.render(scene,camera);
+  })();
+}
+
+/* ================= MISC ================= */
+function confirmReset(){
+  if(confirm("Reset all progress? This clears every stat and missed-question record.")){
+    S={focus:DOMAINS.map(d=>d.id),qstats:{},sessions:0}; save(); go("dash");
+  }
+}
+render();
+</script>
+</body>
+</html>
