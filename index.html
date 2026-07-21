@@ -1626,7 +1626,9 @@ function cableView(){
 }
 /* ---- geometry helpers ---- */
 function M(color,opts){ return new THREE.MeshStandardMaterial(Object.assign({color,roughness:.45,metalness:.25},opts||{})); }
-function Metal(color,shine){ return new THREE.MeshPhongMaterial({color:color,specular:0xffffff,shininess:shine||95,reflectivity:1}); }
+/* Metals use a mid-tone base with a grey (not white) specular, so highlights read
+   as shine instead of blowing out to a flat white silhouette. */
+function Metal(color,shine,spec){ return new THREE.MeshPhongMaterial({color:color,specular:spec||0x8c95a3,shininess:shine||42}); }
 function box(g,w,h,d,x,y,z,mat){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat); m.position.set(x,y,z); g.add(m); return m; }
 /* cylinder laid along the Z axis (the direction every connector points) */
 function tube(g,rt,rb,len,x,y,z,mat,seg){
@@ -1656,15 +1658,15 @@ function ext(g,shape,depth,mat,bev,x,y,z){
 }
 function buildModel(id){
   const g=new THREE.Group();
-  const gold   = Metal(0xd8a63d,120),
-        chrome = Metal(0xcfd6e0,110),
-        nickel = Metal(0xaeb6c2,80),
-        copper = Metal(0xc8763a,110),
+  const gold   = Metal(0xb8862e,55,0xd9b45c),
+        chrome = Metal(0x7e8794,48,0xa8b2c0),
+        nickel = Metal(0x6c7480,38,0x97a0ad),
+        copper = Metal(0xa85c22,50,0xd08c4a),
         clear  = new THREE.MeshPhysicalMaterial({color:0xdce9ff,transparent:true,opacity:.30,roughness:.06,
                    metalness:0,transmission:.55,thickness:.6,side:THREE.DoubleSide}),
         dark   = M(0x24272e,{roughness:.55,metalness:.1}),
         rubber = M(0x17191e,{roughness:.9,metalness:0}),
-        ceramic= M(0xf4f4f1,{roughness:.3,metalness:0}),
+        ceramic= M(0xc9c9c2,{roughness:.55,metalness:0}),
         aqua   = M(0x21b6a8,{roughness:.5}),
         blue   = M(0x1f5fd0,{roughness:.45}),
         beige  = M(0xd8cdb4,{roughness:.55}),
@@ -1773,12 +1775,12 @@ function init3D(){
   renderer.setSize(wpx,hpx,false); renderer.setPixelRatio(window.devicePixelRatio||1);
   const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(45,wpx/hpx,.1,100); camera.position.set(0,1.2,8);
-  scene.add(new THREE.AmbientLight(0xffffff,.34));
-  scene.add(new THREE.HemisphereLight(0xdfe9ff,0x2a2f3a,.55));           // sky/ground fill
-  const key=new THREE.DirectionalLight(0xffffff,1.05); key.position.set(5,7,6); scene.add(key);
-  const fill=new THREE.DirectionalLight(0xa8c4ff,.45); fill.position.set(-6,-1,-4); scene.add(fill);
-  const spec=new THREE.PointLight(0xffffff,.85,40); spec.position.set(1.5,3,6); scene.add(spec);
-  const spec2=new THREE.PointLight(0xbcd0ff,.5,40); spec2.position.set(-4,-2,3); scene.add(spec2);
+  scene.add(new THREE.AmbientLight(0xffffff,.22));
+  scene.add(new THREE.HemisphereLight(0xc9d8f0,0x22262f,.40));           // sky/ground fill
+  const key=new THREE.DirectionalLight(0xffffff,.72); key.position.set(5,7,6); scene.add(key);
+  const fill=new THREE.DirectionalLight(0x9ab4e8,.30); fill.position.set(-6,-1,-4); scene.add(fill);
+  const spec=new THREE.PointLight(0xffffff,.42,45); spec.position.set(2,3.5,6); scene.add(spec);
+  const spec2=new THREE.PointLight(0xa8c0f0,.26,45); spec2.position.set(-4,-2,3); scene.add(spec2);
   const group=buildModel(C3D.cur); group.rotation.set(.35,.7,0); scene.add(group);
   Object.assign(C3D,{renderer,scene,camera,group,drag:false,idle:0});
   cv.onpointerdown=e=>{C3D.drag=true;C3D.px=e.clientX;C3D.py=e.clientY;cv.setPointerCapture(e.pointerId);};
