@@ -66,6 +66,55 @@ Leave it on if you'd rather have the extra check.
 > Copy the **anon public** key, never the **service_role** key. The service_role key
 > bypasses Row Level Security entirely and must never go in a web page.
 
+## 4b. (Optional) Enable "Continue with Google"
+
+Nicer than passwords, but it needs credentials from Google. Roughly 10 minutes.
+
+### First, tell Supabase which addresses are allowed back
+
+**Authentication** → **URL Configuration**:
+
+- **Site URL:** `https://kaijuchu.github.io`
+- **Redirect URLs** — add both, one per line:
+  ```
+  https://kaijuchu.github.io/**
+  http://localhost:8765/**
+  ```
+
+Without the localhost entry, Google sign-in works on the live site but not on your
+local copy.
+
+### Create the Google credentials
+
+1. Go to **https://console.cloud.google.com** and sign in.
+2. Top-left project dropdown → **New Project** → name it `aplus-study-hub` → **Create**.
+3. Left menu → **APIs & Services** → **OAuth consent screen**:
+   - User type: **External** → **Create**
+   - App name: `A+ Study Hub`, plus your email in the two support-email fields
+   - **Save and continue** through Scopes and Test users (nothing to add)
+   - On the summary page, click **Publish app** → **Confirm**
+     (while it's in "Testing", only accounts you list can sign in)
+4. Left menu → **Credentials** → **Create credentials** → **OAuth client ID**:
+   - Application type: **Web application**
+   - Name: `A+ Study Hub web`
+   - Under **Authorised redirect URIs** → **Add URI**, paste your Supabase callback:
+     ```
+     https://YOUR-PROJECT-REF.supabase.co/auth/v1/callback
+     ```
+     (Supabase shows this exact URL on its Google provider page — copy it from there.)
+   - **Create**, then copy the **Client ID** and **Client secret**.
+
+### Paste them into Supabase
+
+- **Authentication** → **Sign In / Providers** → **Google**
+- Toggle **Enable Sign in with Google**
+- Paste the **Client ID** and **Client secret** → **Save**
+
+That's it — the **Continue with Google** button in the app now works. If it reports
+"provider is not enabled", the toggle didn't save; if Google shows a
+`redirect_uri_mismatch` error, the callback URI in step 4 doesn't exactly match the
+one Supabase displays.
+
 ## 5. Connect the app
 
 1. Open the app → **Settings** → **Account & sync**.

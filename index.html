@@ -1831,10 +1831,33 @@ async function cloudInit(){
   if(!cloudConfigured()) return;
   try{
     const cl=await cloudClient();
+    // catches the return trip from a Google sign-in redirect as well as normal sessions
+    cl.auth.onAuthStateChange((event,session)=>{
+      if(session&&session.user){
+        const isNew=!CLOUD.user||CLOUD.user.id!==session.user.id;
+        CLOUD.user=session.user;
+        if(isNew){ CLOUD.msg=""; cloudSync(true); } else render();
+      }else if(event==="SIGNED_OUT"){ CLOUD.user=null; render(); }
+    });
     const {data}=await cl.auth.getSession();
     if(data&&data.session){ CLOUD.user=data.session.user; await cloudSync(true); }
     render();
   }catch(e){ CLOUD.msg=e.message; }
+}
+async function cloudGoogle(){
+  CLOUD.busy=true; CLOUD.msg="Redirecting to Google…"; render();
+  try{
+    const cl=await cloudClient();
+    const back=(typeof location!=="undefined") ? location.origin+location.pathname : undefined;
+    const {error}=await cl.auth.signInWithOAuth({provider:"google",options:{redirectTo:back}});
+    if(error) throw error;
+  }catch(e){
+    CLOUD.busy=false;
+    CLOUD.msg=/provider is not enabled/i.test(e.message||"")
+      ? "Google sign-in isn't switched on yet — see the Google section in SUPABASE-SETUP.md."
+      : (e.message||String(e));
+    render();
+  }
 }
 /* ---- merge: counters take the higher value, settings follow the newer device ---- */
 function mergeState(local,remote){
@@ -1944,6 +1967,15 @@ function accountCard(){
   if(!CLOUD.user){
     return `<div class="card"><h2>${ic("db")}Account &amp; sync</h2>
       <p class="muted" style="margin:6px 0 12px">Sign in to sync your progress, streak and AI questions across devices.</p>
+      <button class="btn small" style="width:100%;justify-content:center;display:flex;align-items:center;gap:9px;margin-bottom:12px"
+        ${CLOUD.busy?"disabled":""} onclick="cloudGoogle()">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;flex-shrink:0">
+          <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8Z"/>
+          <path fill="#34A853" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1 .7-2.3 1.1-4 1.1-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1A12 12 0 0 0 12 24Z"/>
+          <path fill="#FBBC05" d="M5.4 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.4a12 12 0 0 0 0 10.8l4-3.1Z"/>
+          <path fill="#EA4335" d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.5-3.5C17.9 1.2 15.2 0 12 0A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8Z"/>
+        </svg>Continue with Google</button>
+      <div class="muted" style="text-align:center;font-size:.7rem;letter-spacing:.1em;margin-bottom:12px">OR USE EMAIL</div>
       <input class="inp" id="acc-email" type="email" style="width:100%;margin:0 0 8px" placeholder="you@example.com" autocomplete="username">
       <input class="inp" id="acc-pass" type="password" style="width:100%;margin:0 0 12px" placeholder="Password (6+ characters)" autocomplete="current-password"
         onkeydown="if(event.key==='Enter')cloudAuth('in')">
