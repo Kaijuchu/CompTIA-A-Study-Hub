@@ -574,20 +574,19 @@
   #nav button.active .ico{background:none;box-shadow:none}
   #nav button.active .ico::after{display:none}
   #nav button.active .ico svg{filter:none}
-  /* ---- staggered load-in for the interactive bits inside cards ---- */
-  @keyframes childRise{from{opacity:0;transform:translateY(9px) scale(.99);filter:blur(2px)}
-    60%{filter:blur(0)}to{opacity:1;transform:none;filter:blur(0)}}
-  #app.tab-anim :is(.btn,.seg,.set-row,.lab-tile,.focus-item,.gap-item,.bar-row,.opt,.stat-line,.conn-chips,.pbq-chip,.chat-input,.ai-chips){
-    animation:childRise .44s cubic-bezier(.2,.7,.3,1) both}
-  #app.tab-anim :is(.lab-tile,.focus-item,.gap-item,.bar-row,.opt,.set-row,.stat-line):nth-child(1){animation-delay:.16s}
-  #app.tab-anim :is(.lab-tile,.focus-item,.gap-item,.bar-row,.opt,.set-row,.stat-line):nth-child(2){animation-delay:.22s}
-  #app.tab-anim :is(.lab-tile,.focus-item,.gap-item,.bar-row,.opt,.set-row,.stat-line):nth-child(3){animation-delay:.28s}
-  #app.tab-anim :is(.lab-tile,.focus-item,.gap-item,.bar-row,.opt,.set-row,.stat-line):nth-child(4){animation-delay:.34s}
-  #app.tab-anim :is(.lab-tile,.focus-item,.gap-item,.bar-row,.opt,.set-row,.stat-line):nth-child(5){animation-delay:.40s}
-  #app.tab-anim :is(.lab-tile,.focus-item,.gap-item,.bar-row,.opt,.set-row,.stat-line):nth-child(6){animation-delay:.46s}
-  #app.tab-anim :is(.lab-tile,.focus-item,.gap-item,.bar-row,.opt,.set-row,.stat-line):nth-child(n+7){animation-delay:.52s}
-  #app.tab-anim .card .row{animation:childRise .44s cubic-bezier(.2,.7,.3,1) both;animation-delay:.30s}
-  @media (prefers-reduced-motion:reduce){#app.tab-anim :is(.btn,.seg,.set-row,.lab-tile,.focus-item,.gap-item,.bar-row,.opt,.stat-line,.conn-chips,.pbq-chip,.chat-input,.ai-chips,.row){animation:none!important}}
+  /* ---- staggered load-in for a card's contents ----
+     Blur-free (blur would re-composite the glass buttons a frame late), and we only
+     animate each card's DIRECT children so nested toggles ride their row rather than
+     double-animating. Everything keeps its final glass look throughout. */
+  @keyframes childRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  #app.tab-anim .card > *{animation:childRise .40s cubic-bezier(.2,.7,.3,1) both;animation-delay:.14s}
+  #app.tab-anim .card > *:nth-child(2){animation-delay:.19s}
+  #app.tab-anim .card > *:nth-child(3){animation-delay:.24s}
+  #app.tab-anim .card > *:nth-child(4){animation-delay:.29s}
+  #app.tab-anim .card > *:nth-child(5){animation-delay:.34s}
+  #app.tab-anim .card > *:nth-child(6){animation-delay:.39s}
+  #app.tab-anim .card > *:nth-child(n+7){animation-delay:.44s}
+  @media (prefers-reduced-motion:reduce){#app.tab-anim .card > *{animation:none!important}}
   /* cursor-reactive background */
   .cursor-glow{position:absolute;width:46vmax;height:46vmax;left:0;top:0;margin:-23vmax 0 0 -23vmax;
     border-radius:50%;pointer-events:none;opacity:.5;filter:blur(70px);
