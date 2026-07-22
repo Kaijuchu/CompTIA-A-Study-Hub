@@ -552,6 +552,23 @@
                radial-gradient(70% 65% at 96% 110%,rgba(125,211,206,.11),transparent 72%);
     opacity:.85}
   .card:hover{box-shadow:0 22px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.13)}
+  /* ---- lens glass: the frosted-refractive look from the AI button, on cards ---- */
+  .card{isolation:isolate}
+  .card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
+    /* crisp specular sweep across the top edge + soft inner rim, like light through glass */
+    background:
+      radial-gradient(140% 80% at 50% -30%,rgba(255,255,255,.16),rgba(255,255,255,.04) 32%,transparent 55%),
+      linear-gradient(180deg,rgba(255,255,255,.10),transparent 14%);
+    -webkit-mask:linear-gradient(#000,#000);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22),
+               inset 0 0 0 1px rgba(255,255,255,.05),
+               inset 0 -14px 30px rgba(0,0,0,.20);
+    opacity:.9}
+  body.light .card::before{background:radial-gradient(140% 80% at 50% -30%,rgba(255,255,255,.6),transparent 55%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -14px 30px rgba(30,45,80,.06)}
+  .lab-tile,.focus-item,.opt,.pbq-chip,.msg.ai{position:relative}
+  .lab-tile::before,.focus-item::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14);opacity:.9}
   /* cursor-reactive background */
   .cursor-glow{position:absolute;width:46vmax;height:46vmax;left:0;top:0;margin:-23vmax 0 0 -23vmax;
     border-radius:50%;pointer-events:none;opacity:.5;filter:blur(70px);
@@ -1232,6 +1249,22 @@ async function gemFetchModels(){
     S.gemKey=key; save(); render();
   }catch(e){ if(el) el.innerHTML='<span class="danger">'+esc(e.message)+"</span>"; }
 }
+/* Pick the best free model: a standard Flash (fast, capable, generous limits),
+   avoiding preview/experimental/pro/vision variants. */
+function recommendedGemModel(list){
+  const ids=list.map(m=>m.id);
+  const bad=/pro|preview|exp|thinking|image|vision|tts|audio|live|embedding/i;
+  const pref=[
+    id=>/2\.5-flash$/.test(id),               // stable 2.5 Flash — the sweet spot
+    id=>/^gemini-\d[\d.]*-flash$/.test(id)&&!bad.test(id),
+    id=>/flash-lite$/.test(id)&&!bad.test(id),
+    id=>/flash/i.test(id)&&!bad.test(id),
+    id=>!bad.test(id),
+  ];
+  for(const test of pref){ const hit=ids.find(test); if(hit) return hit; }
+  return ids[0]||"gemini-2.5-flash";
+}
+function pickModel(id){ S.gemModel=id; save(); render(); }
 function openSettings(){ go('set'); }
 function setPref(k,v){ S[k]=v; save(); render(); }
 function saveAI(){
@@ -1277,10 +1310,14 @@ function settingsView(){
     <label class="muted">Gemini API key — ${S.gemKey?`<span style="color:var(--good)">${ic("check")} saved</span>`:'<span class="danger">not set</span>'}</label>
     <input class="inp" id="set-gemkey" type="password" style="width:100%;margin:6px 0 10px" value="${esc(S.gemKey)}" placeholder="AIza...">
     <label class="muted">Model</label>
-    <select class="inp" id="set-gemmodel" style="width:100%;margin:6px 0 12px">
-      ${(GEMLIST||[{id:"gemini-3-flash",label:"Gemini 3 Flash (recommended free model)"},{id:"gemini-2.5-flash",label:"Gemini 2.5 Flash"}])
-        .map(m=>`<option value="${m.id}" ${S.gemModel===m.id?"selected":""}>${esc(m.label)}</option>`).join("")}
-    </select>
+    ${(()=>{
+      const list=GEMLIST||[{id:"gemini-2.5-flash",label:"Gemini 2.5 Flash"},{id:"gemini-2.5-flash-lite",label:"Gemini 2.5 Flash-Lite"},{id:"gemini-3-flash",label:"Gemini 3 Flash"}];
+      const rec=recommendedGemModel(list);
+      return `<select class="inp" id="set-gemmodel" style="width:100%;margin:6px 0 8px">
+        ${list.map(m=>`<option value="${m.id}" ${S.gemModel===m.id?"selected":""}>${esc(m.label)}${m.id===rec?"  ★ recommended":""}</option>`).join("")}
+      </select>
+      <div class="muted" style="font-size:.75rem;margin-bottom:12px">★ ${esc((list.find(m=>m.id===rec)||{}).label||"Flash")} is the best balance of speed, quality and free-tier limits. ${S.gemModel!==rec?`<a href="#" onclick="pickModel('${rec}');return false" style="color:var(--accent)">Use it</a>`:"You're using it."}</div>`;
+    })()}
     <div class="row">
       <button class="btn small" onclick="saveAI()">Save AI settings</button>
       <button class="btn small secondary" onclick="gemFetchModels()">↻ Fetch live model list</button>
