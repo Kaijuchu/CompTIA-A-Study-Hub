@@ -1017,14 +1017,20 @@ function quizSetupView(){
     <div class="muted" style="margin-top:8px">Questions leave this list once you answer them correctly.</div>
   </div>
   <div class="card"><h2>${ic("zap")}AI question generator <span class="muted" style="font-weight:400">— fresh questions, never the same twice</span></h2>
-    ${aiReady()?`
-    <div class="row" style="align-items:center">
-      <select id="gen-dom" style="background:rgba(10,15,26,.5);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-size:.88rem">
-        ${gapScores().map((g,i)=>`<option value="${g.id}" ${i===0?"selected":""}>${g.name}${i===0?" (weakest)":""}</option>`).join("")}
-      </select>
-      <button id="gen-btn" class="btn" onclick="runGen()">${ic("zap")} Generate 5 AI questions</button>
-    </div>
-    <div id="gen-msg" class="muted" style="margin-top:8px">Generated questions are saved and count toward your domain stats. (${S.aiQ.length} generated so far)</div>`
+    ${aiReady()?(()=>{
+      const gaps=gapScores();
+      const label=g=>{ const acc=g.acc===null?"untested":Math.round(g.acc*100)+"%"; return g.name+" — "+acc; };
+      return `
+      <div class="muted" style="margin-bottom:8px">Pick a topic. Domains are ordered weakest-first, so the top of the list is where practice helps most.</div>
+      <div class="row" style="align-items:center;flex-wrap:wrap">
+        <select id="gen-dom" onchange="genPick()" style="flex:1;min-width:200px;background:rgba(10,15,26,.5);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px 13px;font-size:.9rem">
+          ${gaps.map((g,i)=>`<option value="${g.id}" ${i===0?"selected":""}>${i===0?"⚠ ":""}${esc(label(g))}${i===0?"  (your weakest)":""}</option>`).join("")}
+        </select>
+        <button id="gen-btn" class="btn" onclick="runGen()">${ic("zap")} Generate 5 questions</button>
+      </div>
+      <div id="gen-topic" class="pill" style="margin-top:12px;display:inline-block">${genTopicLabel(gaps[0])}</div>
+      <div id="gen-msg" class="muted" style="margin-top:10px">Generated questions are saved and count toward your domain stats. (${S.aiQ.length} generated so far)</div>`;
+    })()
     :`<div class="muted">Connect a free Gemini API key to generate unlimited fresh questions targeted at your weak spots.</div>
     <button class="btn secondary small" style="margin-top:10px" onclick="openSettings()">${ic("gear")} Set up AI</button>`}
   </div>`;
@@ -1051,7 +1057,7 @@ function quizView(){
   const q=quiz.items[quiz.idx], dom=DOMAINS.find(d=>d.id===q.d), a=quiz.answered;
   return `<div class="card">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
-      <div class="qnum">Question ${quiz.idx+1} of ${quiz.items.length} · ${esc(dom.name)}<span class="tag ${dom.core===1?'c1':'c2'}">Core ${dom.core}</span></div>
+      <div class="qnum">Question ${quiz.idx+1} of ${quiz.items.length} · ${esc(dom.name)}<span class="tag ${dom.core===1?'c1':'c2'}">Core ${dom.core}</span>${q.ai?`<span class="tag" style="background:rgba(167,139,250,.2);color:#a78bfa">AI</span>`:""}</div>
       <button class="ai-close" title="End quiz" onclick="endQuiz()">✕</button>
     </div>
     <div class="question">${esc(q.q)}</div>
@@ -1158,9 +1164,10 @@ const BULB=`<span style="color:var(--warn)">${ic("bulb")}</span>`;
 /* ================= AI (Gemini free tier / Anthropic) ================= */
 function aiReady(){ return S.provider==="gemini" ? !!S.gemKey : !!S.apiKey; }
 const FETCH_HELP = "The browser blocked the request ('failed to fetch'). Fixes, in order: 1) launch the app with start-app.bat instead of double-clicking the HTML file; 2) turn off ad-blockers/privacy extensions for this page; 3) check your internet/VPN/firewall.";
-async function callClaude(messages, system, maxTokens){
+async function callClaude(messages, system, maxTokens, opts){
+  opts=opts||{};
   if(!aiReady()){ openSettings(); throw new Error("Add your API key first (Settings → AI setup)."); }
-  if(S.provider==="gemini") return callGemini(messages, system, maxTokens);
+  if(S.provider==="gemini") return callGemini(messages, system, maxTokens, opts);
   let r;
   try{
     r = await fetch("https://api.anthropic.com/v1/messages",{
@@ -1175,15 +1182,20 @@ async function callClaude(messages, system, maxTokens){
   if(!j.content) throw new Error("No response returned (HTTP "+r.status+").");
   return j.content.map(b=>b.text||"").join("");
 }
-async function callGemini(messages, system, maxTokens){
+async function callGemini(messages, system, maxTokens, opts){
+  opts=opts||{};
   const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(S.gemModel)+":generateContent?key="+encodeURIComponent(S.gemKey);
+  // Newer Flash models "think" by default, which can eat the whole token budget and
+  // return empty text. Give JSON tasks a big budget and force structured output.
+  const cfg={ maxOutputTokens: maxTokens || (opts.json?4096:1024) };
+  if(opts.json) cfg.responseMimeType="application/json";
   let r;
   try{
     r = await fetch(url,{ method:"POST", headers:{"content-type":"application/json"},
       body:JSON.stringify({
         contents:messages.map(m=>({role:m.role==="assistant"?"model":"user",parts:[{text:m.content}]})),
         systemInstruction:{parts:[{text:system||""}]},
-        generationConfig:{maxOutputTokens:maxTokens||800}
+        generationConfig:cfg
       })});
   }catch(err){ throw new Error(FETCH_HELP); }
   let j; try{ j = await r.json(); }catch(e){ throw new Error("Gemini returned an unreadable response (HTTP "+r.status+"). Try again in a moment."); }
@@ -1194,8 +1206,14 @@ async function callGemini(messages, system, maxTokens){
     throw new Error(m+(/quota|rate/i.test(m)?" — free-tier limit hit; wait a minute and retry.":""));
   }
   const cand=j.candidates&&j.candidates[0];
-  if(!cand||!cand.content||!cand.content.parts) throw new Error("Gemini returned no text (possibly rate-limited or blocked) — wait a moment and retry.");
-  return cand.content.parts.map(p=>p.text||"").join("");
+  const reason=cand&&cand.finishReason;
+  const text=cand&&cand.content&&cand.content.parts ? cand.content.parts.map(p=>p.text||"").join("") : "";
+  if(!text){
+    if(reason==="MAX_TOKENS") throw new Error("The model ran out of room before replying — try again, or pick a lighter model (Settings → AI setup → Fetch live model list → a Flash-Lite model).");
+    if(reason==="SAFETY"||reason==="BLOCKLIST"||reason==="PROHIBITED_CONTENT") throw new Error("The model blocked that request. Try rephrasing, or generate a different domain.");
+    throw new Error("The model returned no text"+(reason?" ("+reason+")":"")+" — wait a moment and retry.");
+  }
+  return text;
 }
 let GEMLIST=null;
 async function gemFetchModels(){
@@ -1414,30 +1432,60 @@ async function sendChat(override){
 function askAboutQ(){ aiOpen=true; renderAiDock(); const i=document.getElementById("ai-in"); if(i) i.focus(); }
 
 /* ---- AI question generation ---- */
+function genTopicLabel(g){
+  if(!g) return "";
+  const rank=gapScores().findIndex(x=>x.id===g.id);
+  const strength = g.acc===null ? "not tested yet"
+    : g.acc>=0.85 ? Math.round(g.acc*100)+"% — a strong area"
+    : g.acc>=0.65 ? Math.round(g.acc*100)+"% — getting there"
+    : Math.round(g.acc*100)+"% — needs work";
+  const priority = rank===0 ? "🎯 Your #1 priority" : rank<3 ? "High priority (weak spot #"+(rank+1)+")" : "Lower priority";
+  return "Generating for: "+g.name+" · "+strength+" · "+priority;
+}
+function genPick(){
+  const sel=document.getElementById("gen-dom"); if(!sel) return;
+  const g=gapScores().find(x=>x.id===sel.value);
+  const el=document.getElementById("gen-topic"); if(el&&g) el.textContent=genTopicLabel(g);
+  const msg=document.getElementById("gen-msg");
+  if(msg) msg.innerHTML='<span class="muted">Generated questions are saved and count toward your domain stats. ('+S.aiQ.length+' generated so far)</span>';
+}
+function parseQuestions(raw){
+  let out=String(raw||"").trim();
+  out=out.replace(/^```(json)?/im,"").replace(/```\s*$/m,"").trim();   // strip any code fences
+  // find the JSON array even if the model added a sentence around it
+  const a=out.indexOf("["), b=out.lastIndexOf("]");
+  if(a!==-1&&b>a) out=out.slice(a,b+1);
+  return JSON.parse(out);
+}
 async function runGen(){
   const sel=document.getElementById("gen-dom"); const btn=document.getElementById("gen-btn");
+  const msg=document.getElementById("gen-msg");
   const domId=sel.value, dom=DOMAINS.find(d=>d.id===domId);
-  btn.disabled=true; btn.textContent="Generating… (few seconds)";
-  const prompt="Generate 5 challenging multiple-choice practice questions for the CompTIA A+ exams "
-   +"(220-1201/220-1202), domain: \""+dom.name+"\". Match the real exam's style: scenario-based where possible. "
-   +"Do not repeat these existing topics too closely: "
-   + QUESTIONS.filter(q=>q.d===domId).slice(0,20).map(q=>q.q).join(" ~ ").slice(0,1500)
-   +". Respond with ONLY a JSON array, no markdown fences, in this exact shape: "
-   +'[{"q":"question text","o":["opt1","opt2","opt3","opt4"],"a":0,"e":"explanation"}] where a is the index of the correct option.';
+  btn.disabled=true; btn.innerHTML=ic("zap")+" Generating…";
+  if(msg) msg.innerHTML='<span class="muted">Asking the AI for 5 fresh '+esc(dom.name)+' questions…</span>';
+  const prompt="Generate exactly 5 challenging multiple-choice practice questions for the CompTIA A+ exams "
+   +"(220-1201 / 220-1202), for the domain \""+dom.name+"\". Make them scenario-based where possible, at real exam difficulty. "
+   +"Each question has exactly 4 options and one correct answer. Avoid closely repeating these existing questions: "
+   + QUESTIONS.filter(q=>q.d===domId).slice(-20).map(q=>q.q).join(" ~ ").slice(0,1500)
+   +'. Return a JSON array of 5 objects with this exact shape: '
+   +'[{"q":"question text","o":["option 1","option 2","option 3","option 4"],"a":0,"e":"short explanation of why the answer is correct"}] '
+   +"where \"a\" is the 0-based index of the correct option.";
   try{
-    let out=await callClaude([{role:"user",content:prompt}], "You output only valid JSON.", 2500);
-    out=out.replace(/^```(json)?/m,"").replace(/```\s*$/m,"").trim();
-    const arr=JSON.parse(out.slice(out.indexOf("["), out.lastIndexOf("]")+1));
-    const good=arr.filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&x.a>=0&&x.a<4&&x.e)
-      .map(x=>({d:domId,q:x.q,o:x.o,a:x.a,e:x.e,ai:true}));
-    if(!good.length) throw new Error("The AI returned no usable questions — try again.");
+    const out=await callClaude([{role:"user",content:prompt}], "You are a CompTIA A+ exam writer. Output only a valid JSON array, nothing else.", 4096, {json:true});
+    let arr;
+    try{ arr=parseQuestions(out); }
+    catch(pe){ throw new Error("The AI's reply wasn't valid question data — please try again."); }
+    if(!Array.isArray(arr)) arr=[arr];
+    const good=arr.filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length===4&&Number.isInteger(x.a)&&x.a>=0&&x.a<4&&x.e)
+      .map(x=>({d:domId,q:String(x.q),o:x.o.map(String),a:x.a,e:String(x.e),ai:true}));
+    if(!good.length) throw new Error("The AI didn't return usable questions this time — try again.");
     const startIdx=QUESTIONS.length;
     QUESTIONS.push(...good); S.aiQ.push(...good); save();
     const items=good.map((q,k)=>({...q,i:startIdx+k}));
-    quiz={items:prep(items),idx:0,right:0,answered:null,results:[]}; tab="quiz"; persistSession(); render();
+    quiz={items:prep(items),idx:0,right:0,answered:null,results:[],genDomain:dom.name}; tab="quiz"; persistSession(); render();
   }catch(e){
     btn.disabled=false; btn.innerHTML=ic("zap")+" Generate 5 AI questions";
-    document.getElementById("gen-msg").innerHTML='<span class="danger">'+esc(e.message)+"</span>";
+    if(msg) msg.innerHTML='<span class="danger">'+esc(e.message)+"</span>";
   }
 }
 
